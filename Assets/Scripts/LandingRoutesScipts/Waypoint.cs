@@ -1,16 +1,29 @@
 using UnityEngine;
+using TMPro;
 
 public class Waypoint : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public TMP_Text label;
+    public SpriteRenderer icon;
+    public Color normalColor = Color.white;
+    public Color visitedColor = Color.green;
+
+    public int order = -1;
+    public string labelText;
+
+    public void SetLabel(string text)
     {
-        
+        labelText = text;
+        label.text = text;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void MarkVisited()
     {
-        
+        icon.color = visitedColor;
+    }
+
+    public void ResetColor()
+    {
+        icon.color = normalColor;
     }
 }
