@@ -8,27 +8,27 @@ public class CargoLogisticsManager : MonoBehaviour
     [SerializeField] private StackSlot[] slots;
     [SerializeField] private GoalStack[] goalOrderPerSlot;
     [SerializeField] private int optimalMoves;
+    [SerializeField] private MoveCount moveCounter;   
 
     private int moveCount = 0;
-    private bool hasPlanningStarted = false;
-    private float sceneStartTime;
 
     void Awake()
     {
         Instance = this;
-        sceneStartTime = Time.time;
     }
 
-    public void OnDragStarted()
+    void Start()
     {
-        if (hasPlanningStarted) return;
-        hasPlanningStarted = true;
-        Debug.Log($"Pre-planning time: {Time.time - sceneStartTime:F2}s");
+        foreach (var slot in slots)
+            if (slot != null) slot.RestackItems();
+
+        if (moveCounter != null) moveCounter.SetMoves(moveCount);
     }
 
     public void RegisterMove()
     {
         moveCount++;
+        if (moveCounter != null) moveCounter.SetMoves(moveCount);
         Debug.Log($"Move {moveCount} (optimal: {optimalMoves})");
         CheckWinCondition();
     }
