@@ -20,6 +20,8 @@ public class TrailMakingManager : MonoBehaviour
 
     public TMP_Text resultText;
     public TMP_Text messageText;
+    public TMP_Text timerText;
+    public TMP_Text errorCountText;
 
     Waypoint[] route;
     int currentIndex;
@@ -36,6 +38,23 @@ public class TrailMakingManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+
+    void Update()
+    {
+        if (!finished && timerText != null)
+        {
+            float elapsed = Time.time - startTime;
+            timerText.text = "Time: " + elapsed.ToString("F1") + "s";
+        }
+    }
+
+    void UpdateErrorDisplay()
+    {
+        if (errorCountText != null)
+        {
+            errorCountText.text = "Errors: " + errors;
+        }
     }
 
     void Start()
@@ -72,6 +91,7 @@ public class TrailMakingManager : MonoBehaviour
 
         if (resultText != null) resultText.text = "";
         if (messageText != null) messageText.text = "";
+        UpdateErrorDisplay();
     }
 
     public void OnReadyClicked()
@@ -127,6 +147,7 @@ public class TrailMakingManager : MonoBehaviour
         else if (over.order > currentIndex)
         {
             errors++;
+            UpdateErrorDisplay();
             if (messageText != null)
             {
                 messageText.text = "Error! Where should you go from here?";
@@ -151,6 +172,8 @@ public class TrailMakingManager : MonoBehaviour
     {
         finished = true;
         float total = Time.time - startTime;
+
+        if (timerText != null) timerText.text = "Time: " + total.ToString("F1") + "s";
 
         if (part == TestPart.A)
         {
