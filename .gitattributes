@@ -1,2 +1,13 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+*.shader linguist-vendored
+*.shadergraph linguist-vendored
+*.shadersubgraph linguist-vendored
+*.cginc linguist-vendored
+*.hlsl linguist-vendored
+*.compute linguist-vendored
+Assets/TextMesh\ Pro/** linguist-vendored
+Packages/** linguist-vendored
+
+*.cs linguist-detectable=true
