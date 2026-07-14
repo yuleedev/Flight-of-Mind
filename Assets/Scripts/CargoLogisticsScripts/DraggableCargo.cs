@@ -64,10 +64,11 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             targetSlot.RestackItems();
             startSlot.RestackItems();
             CargoLogisticsManager.Instance.RegisterMove();
-            //return;
+            //Debug.log($"{name}: {CargoLogisticsManager.Instance.MoveCount} moves made, {CargoLogisticsManager.Instance.OptimalMoves} optimal moves");
         }
         else
         {
+            //Debug.log($"Invalid Drop?");
             if (targetSlot == null)
                 Debug.Log($"{name}: not touching any slot — returning to {startSlot.name}");
             else if (targetSlot == startSlot)

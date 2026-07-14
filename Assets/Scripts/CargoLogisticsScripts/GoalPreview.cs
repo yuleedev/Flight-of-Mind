@@ -4,15 +4,10 @@ using System.Collections.Generic;
 
 public class GoalPreview
 {
-    private static readonly Dictionary<string, Color> ItemColors = new Dictionary<string, Color>
+    //takes whichever block is in a specific position at the scene and then constructs it's own on an small display image on the top left side of the screendd.
+    public static void Build(Canvas canvas, List<List<string>> goalStacks, Dictionary<string, Sprite> itemSprites)
     {
-        { "RedCargo",   Color.red },
-        { "BlueCargo",  Color.blue },
-        { "GreenCargo", Color.green },
-    };
-
-    public static void Build(Canvas canvas, List<List<string>> goalStacks)
-    {
+    
         GameObject root = new GameObject("GoalPreview", typeof(RectTransform));
         RectTransform rootRt = root.GetComponent<RectTransform>();
         rootRt.SetParent(canvas.transform, false);
@@ -35,16 +30,17 @@ public class GoalPreview
         label.fontSize = 24f;
         label.alignment = TMPro.TextAlignmentOptions.Left;
 
-        float swatchSize = 32f;
+        float swatchWidth = 40f;
+        float swatchHeight = 40f;
         float pegSpacing = 90f;
         float baselineY = -190f;
-        int[] capacities = { 3, 2, 1 };       // Stack_A, Stack_B, Stack_C
+        int[] capacities = { 3, 2, 1 };
         string[] pegLabels = { "A", "B", "C" };
 
         for (int s = 0; s < goalStacks.Count && s < capacities.Length; s++)
         {
             float x = 50f + s * pegSpacing;
-            float pegHeight = capacities[s] * (swatchSize + 4f) + 10f;
+            float pegHeight = capacities[s] * (swatchHeight + 4f) + 10f;
 
             GameObject peg = new GameObject($"Peg_{s}", typeof(RectTransform));
             RectTransform pegRt = peg.GetComponent<RectTransform>();
@@ -78,13 +74,25 @@ public class GoalPreview
                 rt.anchorMin = new Vector2(0f, 1f);
                 rt.anchorMax = new Vector2(0f, 1f);
                 rt.pivot = new Vector2(0.5f, 0.5f);
-                rt.sizeDelta = new Vector2(swatchSize, swatchSize);
+                rt.sizeDelta = new Vector2(swatchWidth, swatchHeight);
 
                 int heightFromBottom = (goalStacks[s].Count - 1) - i;
-                float y = baselineY + 5f + (swatchSize * 0.5f) + heightFromBottom * (swatchSize + 4f);
+                float y = baselineY + 5f + (swatchHeight * 0.5f) + heightFromBottom * (swatchHeight + 4f);
                 rt.anchoredPosition = new Vector2(x, y);
 
-                swatch.AddComponent<Image>().color = ItemColors[goalStacks[s][i]];
+                var img = swatch.AddComponent<Image>();
+                string itemName = goalStacks[s][i];
+
+                if (itemSprites.TryGetValue(itemName, out Sprite sprite) && sprite != null)
+                {
+                    img.sprite = sprite;
+                    img.color = Color.white;   
+                    img.preserveAspect = true;
+                }
+                else
+                {
+                    img.color = Color.gray;    
+                }
             }
         }
     }
