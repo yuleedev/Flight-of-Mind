@@ -18,8 +18,11 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         canvas = GetComponentInParent<Canvas>();
     }
 // Tracks the position of the cargo if it is draggable, otherwise it refuses to move
-    public void OnBeginDrag(PointerEventData eventData)
+   public void OnBeginDrag(PointerEventData eventData)
     {
+       if (CargoLogisticsManager.Instance.IsGameOver) { isValidDrag = false; return; }
+
+        startSlot = GetComponentInParent<StackSlot>();
         startSlot = GetComponentInParent<StackSlot>();
         isValidDrag = startSlot != null && startSlot.Top == transform;
 

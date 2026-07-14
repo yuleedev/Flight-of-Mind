@@ -753,9 +753,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CargoLogisticsManager
   slots: []
-  goalOrderPerSlot: []
-  optimalMoves: 0
   moveCounter: {fileID: 2095743432}
+  redCargo: {fileID: 0}
+  blueCargo: {fileID: 0}
+  greenCargo: {fileID: 0}
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0
@@ -765,8 +766,8 @@ Transform:
   m_GameObject: {fileID: 1257229396}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 460, y: 540, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1041, y: 817, z: 0}
+  m_LocalScale: {x: 250, y: 100, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
