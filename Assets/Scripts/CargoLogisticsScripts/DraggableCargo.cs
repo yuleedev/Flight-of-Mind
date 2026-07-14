@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -17,12 +18,13 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
     }
-// Tracks the position of the cargo if it is draggable, otherwise it refuses to move
-   public void OnBeginDrag(PointerEventData eventData)
-    {
-       if (CargoLogisticsManager.Instance.IsGameOver) { isValidDrag = false; return; }
 
-        startSlot = GetComponentInParent<StackSlot>();
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (thinkingTime.Instance != null) thinkingTime.Instance.StopTiming();
+
+        if (CargoLogisticsManager.Instance.IsGameOver) { isValidDrag = false; return; }
+
         startSlot = GetComponentInParent<StackSlot>();
         isValidDrag = startSlot != null && startSlot.Top == transform;
 
@@ -37,13 +39,13 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(canvas.transform, true);
     }
-// Moves the cargo with the mouse while dragging
+
     public void OnDrag(PointerEventData eventData)
     {
         if (!isValidDrag) return;
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
-// Handles the logic for when the cargo is dropped, checking if it is a valid drop and either stacking it or returning it to its original position
+
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!isValidDrag) return;
@@ -64,11 +66,9 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             targetSlot.RestackItems();
             startSlot.RestackItems();
             CargoLogisticsManager.Instance.RegisterMove();
-            //Debug.log($"{name}: {CargoLogisticsManager.Instance.MoveCount} moves made, {CargoLogisticsManager.Instance.OptimalMoves} optimal moves");
         }
         else
         {
-            //Debug.log($"Invalid Drop?");
             if (targetSlot == null)
                 Debug.Log($"{name}: not touching any slot — returning to {startSlot.name}");
             else if (targetSlot == startSlot)
@@ -87,7 +87,6 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         rectTransform.anchoredPosition = startPosition;
     }
 
-    // Finds the slot whose rectangle this block overlaps most at release time
     private StackSlot GetMostOverlappingSlot()
     {
         StackSlot best = null;
@@ -102,6 +101,6 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 best = slot;
             }
         }
-        return best;   // null if the block is touching nothing
+        return best;
     }
 }
