@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UI;
 
 public class CargoLogisticsManager : MonoBehaviour
 {
@@ -8,9 +10,12 @@ public class CargoLogisticsManager : MonoBehaviour
 
     [SerializeField] private StackSlot[] slots;
     [SerializeField] private MoveCount moveCounter;
-    [SerializeField] private GameObject redCargo;
+
+    [FormerlySerializedAs("redCargo")]
+    [SerializeField] private GameObject orangeCargo;
     [SerializeField] private GameObject blueCargo;
-    [SerializeField] private GameObject greenCargo;
+    [FormerlySerializedAs("greenCargo")]
+    [SerializeField] private GameObject whiteCargo;
 
     private Canvas canvas;
     private int moveCount = 0;
@@ -37,8 +42,16 @@ public class CargoLogisticsManager : MonoBehaviour
         goalState = problem.goal;
         optimalMoves = problem.optimalMoves;
 
-        ApplyArrangement(problem.start);   // Randomized problem with the set arrangement.
-        GoalPreview.Build(canvas, problem.goal);
+        ApplyArrangement(problem.start);
+
+        var itemSprites = new Dictionary<string, Sprite>
+        {
+            { "OrangeCargo", orangeCargo.GetComponent<Image>().sprite },
+            { "BlueCargo",   blueCargo.GetComponent<Image>().sprite },
+            { "WhiteCargo",  whiteCargo.GetComponent<Image>().sprite },
+        };
+        GoalPreview.Build(canvas, problem.goal, itemSprites);
+
         moveCounter.SetMoves(0);
 
         foreach (var slot in slots)
@@ -47,12 +60,11 @@ public class CargoLogisticsManager : MonoBehaviour
 
     private void ApplyArrangement(List<List<string>> arrangement)
     {
-        Debug.Log($"Applying arrangement: {string.Join(" | ", arrangement.Select(s => string.Join(",", s)))}");
         var lookup = new Dictionary<string, GameObject>
         {
-            { "RedCargo", redCargo },
+            { "OrangeCargo", orangeCargo },
             { "BlueCargo", blueCargo },
-            { "GreenCargo", greenCargo },
+            { "WhiteCargo", whiteCargo },
         };
 
         for (int s = 0; s < arrangement.Count && s < slots.Length; s++)
@@ -79,7 +91,6 @@ public class CargoLogisticsManager : MonoBehaviour
 
     private bool IsSolved()
     {
-        Debug.Log($"CHECKING — actual vs goal at solve time");
         for (int i = 0; i < slots.Length; i++)
         {
             var actual = slots[i].transform.Cast<Transform>().Select(t => t.name).ToList();

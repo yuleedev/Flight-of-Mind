@@ -4,14 +4,11 @@ using System.Collections.Generic;
 public class StackSlot : MonoBehaviour
 {
     public static List<StackSlot> All = new List<StackSlot>();
-    public int capacity = 3; //ts a lie
+    public int capacity = 3;
 
-
-
-    //Helps format how the cargo is stacked
     [Header("Stacking layout")]
-    public float itemHeight = 90f;   
-    public float bottomPadding = 10f; 
+    public float spacingGap = 0f;    
+    public float bottomPadding = 0f;  
 
     private RectTransform rectTransform;
 
@@ -21,7 +18,7 @@ public class StackSlot : MonoBehaviour
 
     public Transform Top => transform.childCount > 0 ? transform.GetChild(0) : null;
     public bool IsFull => transform.childCount >= capacity;
-    //If the cargo is touching the stack then it is a valid drop, when that valid drop happens it gets stacked
+
     public float OverlapArea(RectTransform item)
     {
         Rect slotRect = GetWorldRect(rectTransform);
@@ -31,7 +28,7 @@ public class StackSlot : MonoBehaviour
         float yOverlap = Mathf.Max(0, Mathf.Min(slotRect.yMax, itemRect.yMax) - Mathf.Max(slotRect.yMin, itemRect.yMin));
         return xOverlap * yOverlap;
     }
-    //Helps with that collosion detection of the Cargo and the Stack.
+
     private Rect GetWorldRect(RectTransform rt)
     {
         Vector3[] corners = new Vector3[4];
@@ -41,23 +38,24 @@ public class StackSlot : MonoBehaviour
                         corners[2].y - corners[0].y);
     }
 
-    // Positions items resting on this slots edge, stacking upwards, just like the normal game
+    // Positions items resting on this slot's floor, stacking upward. Uses each
+    // item's own actual height is used.
     public void RestackItems()
     {
-        
         float halfHeight = rectTransform.rect.height * 0.5f;
         float pivotOffset = (0.5f - rectTransform.pivot.y) * rectTransform.rect.height;
         float bottomEdge = -halfHeight + pivotOffset;
 
         int count = transform.childCount;
-        for (int i = 0; i < count; i++)
+        float runningY = bottomEdge + bottomPadding;
+
+        // Bottom most item updards
+        for (int i = count - 1; i >= 0; i--)
         {
             RectTransform child = transform.GetChild(i).GetComponent<RectTransform>();
-            int heightFromBottom = (count - 1) - i; 
-
-           
-            float y = bottomEdge + bottomPadding + (child.rect.height * 0.5f) + heightFromBottom * itemHeight;
-            child.anchoredPosition = new Vector2(0f, y);
+            float half = child.rect.height * 0.5f;
+            child.anchoredPosition = new Vector2(0f, runningY + half);
+            runningY += child.rect.height + spacingGap;
         }
     }
 }

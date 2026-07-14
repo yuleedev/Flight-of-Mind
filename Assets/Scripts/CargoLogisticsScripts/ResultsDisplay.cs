@@ -28,7 +28,7 @@ public class ResultDisplay
         text.fontSize = 36f;
         text.alignment = TMPro.TextAlignmentOptions.Center;
         text.text = movesTaken == optimalMoves
-            ? $"Solved in {movesTaken} moves — optimal!"
+            ? $"Solved in {movesTaken} moves -- optimal!"
             : $"Solved in {movesTaken} moves (optimal was {optimalMoves})";
     }
 }
