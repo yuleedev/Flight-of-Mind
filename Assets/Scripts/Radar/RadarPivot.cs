@@ -10,6 +10,8 @@ public class RadarPivot : MonoBehaviour
     [SerializeField] private GameObject warningSymbol;
     [SerializeField] private SpriteRenderer warningTriangle;
 
+    [SerializeField] private PassFailCounter passFailCounter;
+
     [SerializeField] private float flashDuration = 0.2f;
     [SerializeField, Range(0f, 1f)] private float flashOpacity = 0.35f;
 
@@ -38,17 +40,7 @@ public class RadarPivot : MonoBehaviour
 
     private void Update()
     {
-        if (flashTimer > 0f)
-        {
-            flashTimer -= Time.deltaTime;
-
-            if (flashTimer <= 0f)
-            {
-                Color color = greenFlash.color;
-                color.a = 0f;
-                greenFlash.color = color;
-            }
-        }
+        UpdateFlash();
 
         if (waitingForNextRotation)
         {
@@ -66,45 +58,69 @@ public class RadarPivot : MonoBehaviour
         transform.Rotate(0f, 0f, -rotationAmount);
         degreesRotated += rotationAmount;
 
-        if (Keyboard.current != null &&
-            Keyboard.current.spaceKey.wasPressedThisFrame &&
-            !pressedThisRotation)
-        {
-            pressedThisRotation = true;
-
-            if (warningActive)
-            {
-                warningTriangle.color = Color.red;
-                FlashScreen(Color.red);
-            }
-            else
-            {
-                FlashScreen(Color.green);
-            }
-        }
+        CheckForPlayerInput();
 
         if (degreesRotated >= 360f)
         {
             degreesRotated -= 360f;
+            FinishRotation();
+        }
+    }
 
-            if (!pressedThisRotation)
+    private void CheckForPlayerInput()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (!Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            return;
+        }
+
+        if (pressedThisRotation)
+        {
+            return;
+        }
+
+        pressedThisRotation = true;
+
+        if (warningActive)
+        {
+            // The player pressed when they should not have pressed.
+            warningTriangle.color = Color.red;
+            FlashScreen(Color.red);
+            passFailCounter.AddFail();
+        }
+        else
+        {
+            FlashScreen(Color.green);
+            passFailCounter.AddPass();
+        }
+    }
+
+    private void FinishRotation()
+    {
+        if (!pressedThisRotation)
+        {
+            if (warningActive)
             {
-                if (warningActive)
-                {
-                    warningTriangle.color = Color.green;
-                    FlashScreen(Color.green);
-                }
-                else
-                {
-                    FlashScreen(Color.red);
-                }
-
-                waitingForNextRotation = true;
+                warningTriangle.color = Color.green;
+                FlashScreen(Color.green);
+                passFailCounter.AddPass();
             }
             else
             {
-                StartNewRotation();
+                FlashScreen(Color.red);
+                passFailCounter.AddFail();
             }
+
+            waitingForNextRotation = true;
+        }
+        else
+        {
+            StartNewRotation();
         }
     }
 
@@ -128,6 +144,23 @@ public class RadarPivot : MonoBehaviour
                     randomPosition.y,
                     warningSymbol.transform.localPosition.z
                 );
+        }
+    }
+
+    private void UpdateFlash()
+    {
+        if (flashTimer <= 0f)
+        {
+            return;
+        }
+
+        flashTimer -= Time.deltaTime;
+
+        if (flashTimer <= 0f)
+        {
+            Color color = greenFlash.color;
+            color.a = 0f;
+            greenFlash.color = color;
         }
     }
 
