@@ -13,6 +13,7 @@ public class TrailMakingManager : MonoBehaviour
     public Transform plane;
     public LineRenderer trail;
 
+	public Vector2 planeStartOffset = new Vector2(0f, -4f);
     public GameObject partAObjects;
     public GameObject partBObjects;
     public GameObject readyPanel;
@@ -60,7 +61,7 @@ public class TrailMakingManager : MonoBehaviour
             route[i].ResetColor();
         }
 
-        plane.position = route[0].transform.position;
+        plane.position = route[0].transform.position + (Vector3)planeStartOffset;
         route[0].MarkVisited();
         currentIndex = 1;
 
