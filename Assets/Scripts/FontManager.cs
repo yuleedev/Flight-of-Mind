@@ -37,8 +37,7 @@ public class FontManager : MonoBehaviour
 
     void Apply(bool on)
     {
-        var texts = FindObjectsByType<TMP_Text>(
-            FindObjectsInactive.Include, FindObjectsSortMode.None);
+        var texts = FindObjectsByType<TMP_Text>(FindObjectsInactive.Include);
 
         foreach (var t in texts)
         {

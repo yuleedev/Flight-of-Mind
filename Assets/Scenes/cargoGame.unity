@@ -1069,9 +1069,9 @@ MonoBehaviour:
   blueGoalIcon: {fileID: 1279709439025416608, guid: 5391cb656c04d414084ef245ff49fd32, type: 3}
   whiteGoalIcon: {fileID: 1824707303822807211, guid: 083246bf6a17d427a8955bd8454d7546, type: 3}
   goalSlots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1545744773}
+  - {fileID: 280908074}
+  - {fileID: 695764296}
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0

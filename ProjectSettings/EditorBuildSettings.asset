@@ -9,7 +9,13 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Menu.unity
     guid: c79e10bd2c79caa4d93466969ba94ac5
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/LandingRoutes.unity
+    guid: e09f7c2f9b42c4bca9da615efb1a6588
+  - enabled: 1
+    path: Assets/Scenes/cargoGame.unity
+    guid: 028761a2977154ddfbe59f295286c9a0
+  - enabled: 1
+    path: Assets/Scenes/Radar.unity
+    guid: 723a86c38e5b59549a2064cc6d55239e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
