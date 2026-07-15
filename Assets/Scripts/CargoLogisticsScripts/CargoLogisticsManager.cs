@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class CargoLogisticsManager : MonoBehaviour
 {
@@ -111,5 +113,13 @@ public class CargoLogisticsManager : MonoBehaviour
         gameOver = true;
         ResultDisplay.Show(canvas, moveCount, optimalMoves);
         Time.timeScale = 0f;
+        StartCoroutine(GoToRadar(2f));
+    }
+
+    private IEnumerator GoToRadar(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Radar");
     }
 }

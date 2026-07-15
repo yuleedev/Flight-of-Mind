@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class TrailMakingManager : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class TrailMakingManager : MonoBehaviour
 	public Vector2 planeStartOffset = new Vector2(0f, -4f);
     public GameObject partAObjects;
     public GameObject partBObjects;
+	public GameObject startPanel;
     public GameObject readyPanel;
 
     public TMP_Text resultText;
@@ -23,6 +25,7 @@ public class TrailMakingManager : MonoBehaviour
     public TMP_Text timerText;
     public TMP_Text errorCountText;
 
+	public float nextSceneDelay = 3f;
     Waypoint[] route;
     int currentIndex;
     int errors;
@@ -56,16 +59,19 @@ public class TrailMakingManager : MonoBehaviour
             errorCountText.text = "Errors: " + errors;
         }
     }
+    
+	void Start()
+	{
+    	if (partBObjects != null) partBObjects.SetActive(false);
+    	if (readyPanel != null) readyPanel.SetActive(false);
 
-    void Start()
-    {
-        if (partBObjects != null) partBObjects.SetActive(false);
-        if (readyPanel != null) readyPanel.SetActive(false);
+    	part = TestPart.A;
+    	route = routeA;
+    	finished = true;
 
-        part = TestPart.A;
-        route = routeA;
-        SetupRound();
-    }
+    	if (startPanel != null) startPanel.SetActive(true);
+    	else SetupRound();
+	}
 
     void SetupRound()
     {
@@ -94,16 +100,25 @@ public class TrailMakingManager : MonoBehaviour
         UpdateErrorDisplay();
     }
 
-    public void OnReadyClicked()
-    {
-        if (readyPanel != null) readyPanel.SetActive(false);
-        if (partAObjects != null) partAObjects.SetActive(false);
-        if (partBObjects != null) partBObjects.SetActive(true);
+	public void OnStartClicked()
+	{
+    	if (startPanel != null) startPanel.SetActive(false);
+    	SetupRound();
+	}
 
-        part = TestPart.B;
-        route = routeB;
-        SetupRound();
-    }
+    public void OnReadyClicked()
+	{
+    	if (readyPanel != null) readyPanel.SetActive(false);
+    	if (partAObjects != null) partAObjects.SetActive(false);
+    	if (partBObjects != null) partBObjects.SetActive(true);
+
+    	if (timerText != null) timerText.gameObject.SetActive(true);
+    	if (errorCountText != null) errorCountText.gameObject.SetActive(true);
+
+    	part = TestPart.B;
+    	route = routeB;
+    	SetupRound();
+	}
 
     public void Draw(Vector3 penPos)
     {
@@ -180,13 +195,16 @@ public class TrailMakingManager : MonoBehaviour
             timeA = total;
             errorsA = errors;
             if (readyPanel != null) readyPanel.SetActive(true);
+			if (timerText != null) timerText.gameObject.SetActive(false);
+    		if (errorCountText != null) errorCountText.gameObject.SetActive(false);
         }
         else
-        {
-            timeB = total;
-            errorsB = errors;
-            ShowResults();
-        }
+		{
+    		timeB = total;
+    		errorsB = errors;
+    		ShowResults();
+    		Invoke(nameof(GoToCargo), nextSceneDelay);
+		}
     }
 
     void ShowResults()
@@ -231,4 +249,9 @@ public class TrailMakingManager : MonoBehaviour
             return ((char)('A' + index / 2)).ToString();
         }
     }
+
+	void GoToCargo()
+	{
+    	SceneManager.LoadScene("cargoGame");
+	}
 }
