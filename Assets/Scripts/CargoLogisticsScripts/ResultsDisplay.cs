@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ResultDisplay
 {
-    // Creates the bottom result banner from code when the game ends.
-    public static void Show(Canvas canvas, int movesTaken, int optimalMoves)
+    private static GameObject activePanel;
+
+    public static void Show(Canvas canvas, string message)
     {
+        if (activePanel != null) Object.Destroy(activePanel);
+
         GameObject panel = new GameObject("ResultPanel", typeof(RectTransform));
         RectTransform rt = panel.GetComponent<RectTransform>();
         rt.SetParent(canvas.transform, false);
@@ -24,11 +28,20 @@ public class ResultDisplay
         textRt.anchorMax = Vector2.one;
         textRt.sizeDelta = Vector2.zero;
 
-        var text = textGo.AddComponent<TMPro.TextMeshProUGUI>();
-        text.fontSize = 36f;
-        text.alignment = TMPro.TextAlignmentOptions.Center;
-        text.text = movesTaken == optimalMoves
-            ? $"Solved in {movesTaken} moves -- optimal!"
-            : $"Solved in {movesTaken} moves (optimal was {optimalMoves})";
+        var text = textGo.AddComponent<TextMeshProUGUI>();
+        text.fontSize = 32f;
+        text.alignment = TextAlignmentOptions.Center;
+        text.text = message;
+
+        activePanel = panel;
+
+        if (FontManager.Instance != null)
+            FontManager.Instance.SetDyslexia(FontManager.Instance.IsOn);
+    }
+
+    public static void Hide()
+    {
+        if (activePanel != null) Object.Destroy(activePanel);
+        activePanel = null;
     }
 }

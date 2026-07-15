@@ -3,48 +3,48 @@ using UnityEngine;
 
 public class TowerOfLondonProblem
 {
-    public List<List<string>> start;
     public List<List<string>> goal;
     public int optimalMoves;
+    public bool isPractice;
 
-    public TowerOfLondonProblem(List<List<string>> start, List<List<string>> goal, int optimalMoves)
+    public TowerOfLondonProblem(List<List<string>> goal, int optimalMoves, bool isPractice = false)
     {
-        this.start = start;
         this.goal = goal;
         this.optimalMoves = optimalMoves;
+        this.isPractice = isPractice;
     }
 }
 
 public static class ProblemLibrary
 {
-    // Every list is top-to-bottom. Capacities must be Stack_A=3, Stack_B=2, Stack_C=1.
-    public static readonly List<TowerOfLondonProblem> All = new List<TowerOfLondonProblem>
+
+    public static readonly List<List<string>> FixedStart = new List<List<string>>
     {
-        new(new(){new(){"BlueCargo","OrangeCargo"}, new(){"WhiteCargo"}, new(){}},
-            new(){new(){"OrangeCargo"}, new(){"BlueCargo"}, new(){"WhiteCargo"}}, 2),
-        new(new(){new(){"BlueCargo"}, new(){"OrangeCargo","WhiteCargo"}, new(){}},
-            new(){new(){"OrangeCargo","WhiteCargo","BlueCargo"}, new(){}, new(){}}, 3),
-        new(new(){new(){"BlueCargo","OrangeCargo","WhiteCargo"}, new(){}, new(){}},
-            new(){new(){"BlueCargo","WhiteCargo"}, new(){}, new(){"OrangeCargo"}}, 3),
-        new(new(){new(){"OrangeCargo"}, new(){"BlueCargo"}, new(){"WhiteCargo"}},
-            new(){new(){}, new(){"OrangeCargo","WhiteCargo"}, new(){"BlueCargo"}}, 4),
-        new(new(){new(){"BlueCargo"}, new(){"OrangeCargo","WhiteCargo"}, new(){}},
-            new(){new(){"BlueCargo"}, new(){"WhiteCargo","OrangeCargo"}, new(){}}, 4),
-        new(new(){new(){"OrangeCargo","BlueCargo","WhiteCargo"}, new(){}, new(){}},
-            new(){new(){"OrangeCargo"}, new(){"BlueCargo"}, new(){"WhiteCargo"}}, 5),
-        new(new(){new(){"OrangeCargo","BlueCargo","WhiteCargo"}, new(){}, new(){}},
-            new(){new(){"WhiteCargo","OrangeCargo"}, new(){"BlueCargo"}, new(){}}, 5),
-        new(new(){new(){"BlueCargo"}, new(){"WhiteCargo"}, new(){"OrangeCargo"}},
-            new(){new(){"BlueCargo","WhiteCargo","OrangeCargo"}, new(){}, new(){}}, 5),
-        new(new(){new(){"BlueCargo","WhiteCargo"}, new(){"OrangeCargo"}, new(){}},
-            new(){new(){"WhiteCargo","OrangeCargo"}, new(){}, new(){"BlueCargo"}}, 6),
-        new(new(){new(){"WhiteCargo"}, new(){"BlueCargo","OrangeCargo"}, new(){}},
-            new(){new(){}, new(){"BlueCargo","WhiteCargo"}, new(){"OrangeCargo"}}, 6),
-        new(new(){new(){"OrangeCargo","WhiteCargo"}, new(){"BlueCargo"}, new(){}},
-            new(){new(){}, new(){"BlueCargo","WhiteCargo"}, new(){"OrangeCargo"}}, 7),
-        new(new(){new(){"BlueCargo","WhiteCargo"}, new(){}, new(){"OrangeCargo"}},
-            new(){new(){"BlueCargo"}, new(){"OrangeCargo"}, new(){"WhiteCargo"}}, 4),
+        new(){ "OrangeCargo", "WhiteCargo" },
+        new(){ "BlueCargo" },
+        new(){ }
     };
 
-    public static TowerOfLondonProblem PickRandom() => All[Random.Range(0, All.Count)];
+    // 1 practice trial (2 moves) + 12 scored trials (2,2,3,3,4,4,4,4,5,5,5,5),
+    //A:3 B:2 C:1
+    public static readonly List<TowerOfLondonProblem> Sequence = new List<TowerOfLondonProblem>
+    {
+        new(new(){ new(){}, new(){"OrangeCargo","BlueCargo"}, new(){"WhiteCargo"} }, 2, isPractice: true),
+
+        new(new(){ new(){}, new(){"WhiteCargo","BlueCargo"}, new(){"OrangeCargo"} }, 2),
+        new(new(){ new(){"BlueCargo","WhiteCargo"}, new(){}, new(){"OrangeCargo"} }, 2),
+
+        new(new(){ new(){"OrangeCargo"}, new(){"BlueCargo"}, new(){"WhiteCargo"} }, 3),
+        new(new(){ new(){"OrangeCargo"}, new(){"WhiteCargo","BlueCargo"}, new(){} }, 3),
+
+        new(new(){ new(){"BlueCargo","OrangeCargo"}, new(){}, new(){"WhiteCargo"} }, 4),
+        new(new(){ new(){"WhiteCargo","OrangeCargo"}, new(){"BlueCargo"}, new(){} }, 4),
+        new(new(){ new(){"BlueCargo"}, new(){"WhiteCargo","OrangeCargo"}, new(){} }, 4),
+        new(new(){ new(){}, new(){"BlueCargo","OrangeCargo"}, new(){"WhiteCargo"} }, 4),
+
+        new(new(){ new(){"WhiteCargo","BlueCargo","OrangeCargo"}, new(){}, new(){} }, 5),
+        new(new(){ new(){"BlueCargo","OrangeCargo"}, new(){"WhiteCargo"}, new(){} }, 5),
+        new(new(){ new(){"BlueCargo","WhiteCargo","OrangeCargo"}, new(){}, new(){} }, 5),
+        new(new(){ new(){"WhiteCargo","OrangeCargo"}, new(){}, new(){"BlueCargo"} }, 5),
+    };
 }

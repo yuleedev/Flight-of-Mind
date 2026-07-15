@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
-using UnityEngine.SceneManagement;
 
 public class CargoLogisticsManager : MonoBehaviour
 {
@@ -26,13 +26,18 @@ public class CargoLogisticsManager : MonoBehaviour
     [Header("Goal Preview Slots")]
     [SerializeField] private GoalSlotDisplay[] goalSlots;
 
+    [Header("Instructions")]
+    [SerializeField] private GameObject startPanel;
+
     private Canvas canvas;
     private int moveCount = 0;
-    private int optimalMoves = 0;
-    private bool gameOver = false;
+    private int currentProblemIndex = -1;
+    private bool problemSolved = false;
+    private bool sessionComplete = false;
     private List<List<string>> goalState;
+    private int currentOptimalMoves;
 
-    public bool IsGameOver => gameOver;
+    public bool IsGameOver => sessionComplete;
 
     void Awake()
     {
@@ -47,11 +52,29 @@ public class CargoLogisticsManager : MonoBehaviour
 
     void Start()
     {
-        TowerOfLondonProblem problem = ProblemLibrary.PickRandom();
-        goalState = problem.goal;
-        optimalMoves = problem.optimalMoves;
+        if (startPanel != null) startPanel.SetActive(true);
+        else LoadProblem(0);
+    }
 
-        ApplyArrangement(problem.start);
+    public void OnStartClicked()
+    {
+        CargoLogisticsResults.Clear();
+
+        if (startPanel != null) startPanel.SetActive(false);
+        LoadProblem(0);
+    }
+
+    private void LoadProblem(int index)
+    {
+        currentProblemIndex = index;
+        problemSolved = false;
+
+        TowerOfLondonProblem problem = ProblemLibrary.Sequence[index];
+        goalState = problem.goal;
+        currentOptimalMoves = problem.optimalMoves;
+        moveCount = 0;
+
+        ApplyArrangement(ProblemLibrary.FixedStart);
 
         var itemSprites = new Dictionary<string, Sprite>
         {
@@ -65,6 +88,9 @@ public class CargoLogisticsManager : MonoBehaviour
 
         foreach (var slot in slots)
             slot.RestackItems();
+
+        if (thinkingTime.Instance != null)
+            thinkingTime.Instance.ResetTimer();
     }
 
     private void ApplyArrangement(List<List<string>> arrangement)
@@ -89,13 +115,16 @@ public class CargoLogisticsManager : MonoBehaviour
 
     public void RegisterMove()
     {
-        if (gameOver) return;
+        if (sessionComplete || problemSolved) return;
 
         moveCount++;
         moveCounter.SetMoves(moveCount);
 
         if (IsSolved())
-            EndGame();
+        {
+            problemSolved = true;
+            OnProblemSolved();
+        }
     }
 
     private bool IsSolved()
@@ -108,18 +137,44 @@ public class CargoLogisticsManager : MonoBehaviour
         return true;
     }
 
-    private void EndGame()
+    private void OnProblemSolved()
     {
-        gameOver = true;
-        ResultDisplay.Show(canvas, moveCount, optimalMoves);
+        TowerOfLondonProblem problem = ProblemLibrary.Sequence[currentProblemIndex];
+        bool isLastProblem = currentProblemIndex == ProblemLibrary.Sequence.Count - 1;
+
+        float thinkTime = thinkingTime.Instance != null ? thinkingTime.Instance.ThinkingTimeSeconds : 0f;
+        CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves, thinkTime);
+
+        Debug.Log($"Trial {currentProblemIndex}: {moveCount} moves ({moveCount - currentOptimalMoves} excess), {thinkTime:F2}s to first move");
+
+        string message;
+        if (problem.isPractice)
+            message = "Practice complete! Starting the timed problems...";
+        else if (isLastProblem)
+            message = $"All problems complete! Last one solved in {moveCount} moves (optimal was {currentOptimalMoves}).";
+        else
+            message = $"Solved in {moveCount} moves (optimal was {currentOptimalMoves}).";
+
+        ResultDisplay.Show(canvas, message);
         Time.timeScale = 0f;
-        StartCoroutine(GoToRadar(2f));
+
+        StartCoroutine(AdvanceAfterDelay(2f, isLastProblem));
     }
 
-    private IEnumerator GoToRadar(float seconds)
+    private IEnumerator AdvanceAfterDelay(float seconds, bool isLastProblem)
     {
         yield return new WaitForSecondsRealtime(seconds);
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Radar");
+        ResultDisplay.Hide();
+
+        if (isLastProblem)
+        {
+            sessionComplete = true;
+            SceneManager.LoadScene("Radar");
+        }
+        else
+        {
+            LoadProblem(currentProblemIndex + 1);
+        }
     }
 }

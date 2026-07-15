@@ -4,7 +4,7 @@ public class thinkingTime : MonoBehaviour
 {
     public static thinkingTime Instance;
 
-    public float ThinkingTimeSeconds { get; private set; }// amount of time in seconds the person spent thinking.
+    public float ThinkingTimeSeconds { get; private set; }
     public bool HasStoppedTiming { get; private set; }
 
     private float startTime;
@@ -16,7 +16,14 @@ public class thinkingTime : MonoBehaviour
 
     void Start()
     {
+        ResetTimer();
+    }
+
+    public void ResetTimer()
+    {
         startTime = Time.time;
+        HasStoppedTiming = false;
+        ThinkingTimeSeconds = 0f;
     }
 
     public void StopTiming()
