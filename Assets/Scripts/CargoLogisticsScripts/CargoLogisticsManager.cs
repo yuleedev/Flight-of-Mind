@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.UI;
 
 public class CargoLogisticsManager : MonoBehaviour
 {
@@ -16,6 +15,14 @@ public class CargoLogisticsManager : MonoBehaviour
     [SerializeField] private GameObject blueCargo;
     [FormerlySerializedAs("greenCargo")]
     [SerializeField] private GameObject whiteCargo;
+
+    [Header("Goal Preview Icons")]
+    [SerializeField] private Sprite orangeGoalIcon;
+    [SerializeField] private Sprite blueGoalIcon;
+    [SerializeField] private Sprite whiteGoalIcon;
+
+    [Header("Goal Preview Slots")]
+    [SerializeField] private GoalSlotDisplay[] goalSlots;
 
     private Canvas canvas;
     private int moveCount = 0;
@@ -33,7 +40,7 @@ public class CargoLogisticsManager : MonoBehaviour
             return;
         }
         Instance = this;
-        canvas = FindFirstObjectByType<Canvas>();
+        canvas = FindAnyObjectByType<Canvas>();
     }
 
     void Start()
@@ -46,11 +53,11 @@ public class CargoLogisticsManager : MonoBehaviour
 
         var itemSprites = new Dictionary<string, Sprite>
         {
-            { "OrangeCargo", orangeCargo.GetComponent<Image>().sprite },
-            { "BlueCargo",   blueCargo.GetComponent<Image>().sprite },
-            { "WhiteCargo",  whiteCargo.GetComponent<Image>().sprite },
+            { "OrangeCargo", orangeGoalIcon },
+            { "BlueCargo",   blueGoalIcon },
+            { "WhiteCargo",  whiteGoalIcon },
         };
-        GoalPreview.Build(canvas, problem.goal, itemSprites);
+        GoalPreview.Build(goalSlots, problem.goal, itemSprites);
 
         moveCounter.SetMoves(0);
 
