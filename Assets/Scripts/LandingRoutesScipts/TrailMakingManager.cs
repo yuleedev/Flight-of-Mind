@@ -19,9 +19,9 @@ public class TrailMakingManager : MonoBehaviour
     public GameObject partBObjects;
 	public GameObject startPanel;
     public GameObject readyPanel;
+    public GameObject messagePanel;
 
     public TMP_Text resultText;
-    public TMP_Text messageText;
     public TMP_Text timerText;
     public TMP_Text errorCountText;
 
@@ -96,7 +96,7 @@ public class TrailMakingManager : MonoBehaviour
         startTime = Time.time;
 
         if (resultText != null) resultText.text = "";
-        if (messageText != null) messageText.text = "";
+        if (messagePanel != null) messagePanel.SetActive(false);
         UpdateErrorDisplay();
     }
 
@@ -163,9 +163,9 @@ public class TrailMakingManager : MonoBehaviour
         {
             errors++;
             UpdateErrorDisplay();
-            if (messageText != null)
+            if (messagePanel != null)
             {
-                messageText.text = "Error! Where should you go from here?";
+                messagePanel.SetActive(true);
             }
         }
     }
@@ -175,7 +175,7 @@ public class TrailMakingManager : MonoBehaviour
         w.MarkVisited();
         currentIndex++;
 
-        if (messageText != null) messageText.text = "";
+        if (messagePanel != null) messagePanel.SetActive(false);
 
         if (currentIndex >= route.Length)
         {
