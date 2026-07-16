@@ -104,10 +104,10 @@ public class CargoLogisticsManager : MonoBehaviour
 
         for (int s = 0; s < arrangement.Count && s < slots.Length; s++)
         {
-            for (int i = arrangement[s].Count - 1; i >= 0; i--)
+            for (int i = 0; i < arrangement[s].Count; i++)
             {
                 GameObject item = lookup[arrangement[s][i]];
-                item.transform.SetParent(slots[s].transform);
+                item.transform.SetParent(slots[s].transform, false);
                 item.transform.SetAsFirstSibling();
             }
         }
@@ -129,10 +129,12 @@ public class CargoLogisticsManager : MonoBehaviour
 
     private bool IsSolved()
     {
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = 0; i < slots.Length && i < goalState.Count; i++)
         {
+
             var actual = slots[i].transform.Cast<Transform>().Select(t => t.name).ToList();
-            if (!actual.SequenceEqual(goalState[i])) return false;
+            var expected = Enumerable.Reverse(goalState[i]).ToList();
+            if (!actual.SequenceEqual(expected)) return false;
         }
         return true;
     }

@@ -4,19 +4,39 @@ using System.Collections.Generic;
 public class StackSlot : MonoBehaviour
 {
     public static List<StackSlot> All = new List<StackSlot>();
+
+    [Tooltip("3 / 2 / 1 for Slot_A / Slot_B / Slot_C. Changing these silently invalidates " +
+             "every optimalMoves value baked into ProblemLibrary.")]
     public int capacity = 3;
 
     [Header("Stacking layout")]
-    public float spacingGap = 0f;    
-    public float bottomPadding = 0f;  
+    [Tooltip("Extra space between crates. Keep at 0 for crates that physically touch.")]
+    public float spacingGap = 0f;
+    [Tooltip("Distance from the slot's bottom edge up to the floor the bottom crate rests on.")]
+    public float bottomPadding = 0f;
 
     private RectTransform rectTransform;
 
-    void Awake() => rectTransform = GetComponent<RectTransform>();
+
+    void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            Destroy(rb);
+        }
+        foreach (var col in GetComponents<Collider2D>())
+        {
+            Destroy(col);
+        }
+    }
+
     void OnEnable() => All.Add(this);
     void OnDisable() => All.Remove(this);
 
-    public Transform Top => transform.childCount > 0 ? transform.GetChild(0) : null;
+    public Transform Top => transform.childCount > 0 ? transform.GetChild(transform.childCount - 1) : null;
     public bool IsFull => transform.childCount >= capacity;
 
     public float OverlapArea(RectTransform item)
@@ -38,24 +58,50 @@ public class StackSlot : MonoBehaviour
                         corners[2].y - corners[0].y);
     }
 
-    // Positions items resting on this slot's floor, stacking upward. Uses each
-    // item's own actual height is used.
+    private float GetItemHeight(Transform item)
+    {
+        DraggableCargo cargo = item.GetComponent<DraggableCargo>();
+        if (cargo != null) return cargo.VisualHeight;
+
+        RectTransform rt = item.GetComponent<RectTransform>();
+        return rt != null ? rt.rect.height : 0f;
+    }
+
+
+    private float FloorY()
+    {
+        if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+        return -rectTransform.rect.height * 0.5f + bottomPadding;
+    }
+
+
     public void RestackItems()
     {
-        float halfHeight = rectTransform.rect.height * 0.5f;
-        float pivotOffset = (0.5f - rectTransform.pivot.y) * rectTransform.rect.height;
-        float bottomEdge = -halfHeight + pivotOffset;
-
+        float runningY = FloorY();
         int count = transform.childCount;
-        float runningY = bottomEdge + bottomPadding;
 
-        // Bottom most item updards
-        for (int i = count - 1; i >= 0; i--)
+        for (int i = 0; i < count; i++)
         {
-            RectTransform child = transform.GetChild(i).GetComponent<RectTransform>();
-            float half = child.rect.height * 0.5f;
-            child.anchoredPosition = new Vector2(0f, runningY + half);
-            runningY += child.rect.height + spacingGap;
+            Transform child = transform.GetChild(i);
+            RectTransform childRt = child.GetComponent<RectTransform>();
+            if (childRt == null) continue;
+
+            float height = GetItemHeight(child);
+            childRt.anchoredPosition = new Vector2(0f, runningY + height * 0.5f);
+            runningY += height + spacingGap;
         }
+    }
+
+
+    public float GetRestingYForTopItem()
+    {
+        int count = transform.childCount;
+        float runningY = FloorY();
+        if (count == 0) return runningY;
+
+        for (int i = 0; i < count - 1; i++)
+            runningY += GetItemHeight(transform.GetChild(i)) + spacingGap;
+
+        return runningY + GetItemHeight(transform.GetChild(count - 1)) * 0.5f;
     }
 }
