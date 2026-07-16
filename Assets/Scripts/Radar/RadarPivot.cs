@@ -6,6 +6,8 @@ public class RadarPivot : MonoBehaviour
 {
     [SerializeField] private float rotationSpeed = 90f;
 
+    [SerializeField] private GameObject instructionsPanel;
+
     [SerializeField] private Image greenFlash;
     [SerializeField] private float flashDuration = 0.2f;
     [SerializeField, Range(0f, 1f)] private float flashOpacity = 0.35f;
@@ -21,6 +23,7 @@ public class RadarPivot : MonoBehaviour
     private float flashTimer;
     private float rotationStartTime;
 
+    private bool gameStarted;
     private bool pressedThisRotation;
     private bool warningActive;
     private bool waitingForNextRotation;
@@ -35,6 +38,7 @@ public class RadarPivot : MonoBehaviour
         flashTimer = 0f;
         rotationStartTime = 0f;
 
+        gameStarted = false;
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
@@ -50,15 +54,45 @@ public class RadarPivot : MonoBehaviour
         {
             warningSymbol.SetActive(false);
         }
+
+        if (instructionsPanel != null)
+        {
+            instructionsPanel.SetActive(true);
+        }
     }
 
-    private void Start()
+    public void StartGame()
     {
+        if (gameStarted)
+        {
+            return;
+        }
+
+        gameStarted = true;
+
+        if (instructionsPanel != null)
+        {
+            instructionsPanel.SetActive(false);
+        }
+
+        degreesRotated = 0f;
+        flashTimer = 0f;
+        pressedThisRotation = false;
+        warningActive = false;
+        waitingForNextRotation = false;
+
+        transform.localRotation = Quaternion.identity;
+
         StartNewRotation();
     }
 
     private void Update()
     {
+        if (!gameStarted)
+        {
+            return;
+        }
+
         UpdateFlash();
 
         if (waitingForNextRotation)
