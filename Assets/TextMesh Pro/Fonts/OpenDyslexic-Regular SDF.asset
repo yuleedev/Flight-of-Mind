@@ -12,9 +12,9 @@ Texture2D:
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
   serializedVersion: 4
-  m_Width: 1
-  m_Height: 1
-  m_CompleteImageSize: 1
+  m_Width: 1024
+  m_Height: 1024
+  m_CompleteImageSize: 1048576
   m_MipsStripped: 0
   m_TextureFormat: 1
   m_MipCount: 1
@@ -1611,7 +1611,35 @@ MonoBehaviour:
     m_Width: 82
     m_Height: 96
   m_FreeGlyphRects:
+  - m_X: 161
+    m_Y: 28
+    m_Width: 12
+    m_Height: 68
+  - m_X: 60
+    m_Y: 108
+    m_Width: 2
+    m_Height: 25
   - m_X: 0
+    m_Y: 179
+    m_Width: 60
+    m_Height: 24
+  - m_X: 806
+    m_Y: 73
+    m_Width: 12
+    m_Height: 36
+  - m_X: 806
+    m_Y: 96
+    m_Width: 75
+    m_Height: 13
+  - m_X: 748
+    m_Y: 94
+    m_Width: 1
+    m_Height: 65
+  - m_X: 193
+    m_Y: 168
+    m_Width: 35
+    m_Height: 20
+  - m_X: 1009
     m_Y: 0
     m_Width: 14
     m_Height: 205
