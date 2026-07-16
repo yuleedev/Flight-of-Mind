@@ -28,7 +28,14 @@ public class PassFailCounter : MonoBehaviour
 
     private void UpdateDisplay()
     {
-        passText.text = "Passes: " + passes;
-        failText.text = "Fails: " + fails;
+        if (passText != null)
+        {
+            passText.text = "Passes: " + passes;
+        }
+
+        if (failText != null)
+        {
+            failText.text = "Fails: " + fails;
+        }
     }
 }
