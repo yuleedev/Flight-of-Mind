@@ -4,25 +4,22 @@ using UnityEngine.InputSystem;
 
 public class RadarPivot : MonoBehaviour
 {
-    [Header("Radar Settings")]
     [SerializeField] private float rotationSpeed = 90f;
 
-    [Header("Screen Flash")]
     [SerializeField] private Image greenFlash;
     [SerializeField] private float flashDuration = 0.2f;
     [SerializeField, Range(0f, 1f)] private float flashOpacity = 0.35f;
 
-    [Header("Warning")]
     [SerializeField] private GameObject warningSymbol;
     [SerializeField] private SpriteRenderer warningTriangle;
     [SerializeField, Range(0f, 1f)] private float warningChance = 0.3f;
     [SerializeField] private float warningRadius = 2f;
 
-    [Header("Score")]
     [SerializeField] private PassFailCounter passFailCounter;
 
     private float degreesRotated;
     private float flashTimer;
+    private float rotationStartTime;
 
     private bool pressedThisRotation;
     private bool warningActive;
@@ -36,6 +33,8 @@ public class RadarPivot : MonoBehaviour
 
         degreesRotated = 0f;
         flashTimer = 0f;
+        rotationStartTime = 0f;
+
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
@@ -45,7 +44,7 @@ public class RadarPivot : MonoBehaviour
             warningStartColor = warningTriangle.color;
         }
 
-        HideScreenFlash();
+        HideFlash();
 
         if (warningSymbol != null)
         {
@@ -117,11 +116,37 @@ public class RadarPivot : MonoBehaviour
 
             if (passFailCounter != null)
             {
-                passFailCounter.AddFail();
+                passFailCounter.AddFalsePositive();
             }
         }
         else
         {
+            float reactionTime = Time.time - rotationStartTime;
+
+            FlashScreen(Color.green);
+
+            if (passFailCounter != null)
+            {
+                passFailCounter.AddPass(reactionTime);
+            }
+        }
+    }
+
+    private void FinishRotation()
+    {
+        if (pressedThisRotation)
+        {
+            StartNewRotation();
+            return;
+        }
+
+        if (warningActive)
+        {
+            if (warningTriangle != null)
+            {
+                warningTriangle.color = Color.green;
+            }
+
             FlashScreen(Color.green);
 
             if (passFailCounter != null)
@@ -129,82 +154,60 @@ public class RadarPivot : MonoBehaviour
                 passFailCounter.AddPass();
             }
         }
-    }
-
-    private void FinishRotation()
-    {
-        if (!pressedThisRotation)
-        {
-            if (warningActive)
-            {
-                if (warningTriangle != null)
-                {
-                    warningTriangle.color = Color.green;
-                }
-
-                FlashScreen(Color.green);
-
-                if (passFailCounter != null)
-                {
-                    passFailCounter.AddPass();
-                }
-            }
-            else
-            {
-                FlashScreen(Color.red);
-
-                if (passFailCounter != null)
-                {
-                    passFailCounter.AddFail();
-                }
-            }
-
-            waitingForNextRotation = true;
-        }
         else
         {
-            StartNewRotation();
+            FlashScreen(Color.red);
+
+            if (passFailCounter != null)
+            {
+                passFailCounter.AddFalseNegative();
+            }
         }
+
+        waitingForNextRotation = true;
     }
 
     private void StartNewRotation()
     {
         pressedThisRotation = false;
         warningActive = Random.value < warningChance;
+        rotationStartTime = Time.time;
 
         if (warningSymbol != null)
         {
             warningSymbol.SetActive(warningActive);
         }
 
-        if (warningActive)
+        if (!warningActive)
         {
-            if (warningTriangle != null)
-            {
-                warningTriangle.color = warningStartColor;
-            }
+            return;
+        }
 
-            if (warningSymbol != null)
-            {
-                Vector2 randomPosition =
-                    Random.insideUnitCircle * warningRadius;
+        if (warningTriangle != null)
+        {
+            warningTriangle.color = warningStartColor;
+        }
 
-                Vector3 currentPosition =
-                    warningSymbol.transform.localPosition;
+        if (warningSymbol != null)
+        {
+            Vector2 randomPosition =
+                Random.insideUnitCircle * warningRadius;
 
-                warningSymbol.transform.localPosition =
-                    new Vector3(
-                        randomPosition.x,
-                        randomPosition.y,
-                        currentPosition.z
-                    );
-            }
+            Vector3 currentPosition =
+                warningSymbol.transform.localPosition;
+
+            warningSymbol.transform.localPosition =
+                new Vector3(
+                    randomPosition.x,
+                    randomPosition.y,
+                    currentPosition.z
+                );
         }
     }
 
     private void UpdateFlash()
     {
-        if (greenFlash == null || flashTimer <= 0f)
+        if (flashTimer <= 0f)
         {
             return;
         }
@@ -213,7 +216,8 @@ public class RadarPivot : MonoBehaviour
 
         if (flashTimer <= 0f)
         {
-            HideScreenFlash();
+            flashTimer = 0f;
+            HideFlash();
         }
     }
 
@@ -229,7 +233,7 @@ public class RadarPivot : MonoBehaviour
         flashTimer = flashDuration;
     }
 
-    private void HideScreenFlash()
+    private void HideFlash()
     {
         if (greenFlash == null)
         {
