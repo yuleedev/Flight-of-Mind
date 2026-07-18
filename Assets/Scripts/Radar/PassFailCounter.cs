@@ -17,6 +17,20 @@ public class PassFailCounter : MonoBehaviour
     private float totalReactionTime;
     private int reactionTimeCount;
 
+    public int Passes => passes;
+    public int Fails => fails;
+    public int FalsePositives => falsePositives;
+    public int FalseNegatives => falseNegatives;
+
+    public bool HasReactionTime =>
+        reactionTimeCount > 0;
+
+    public float AverageReactionTime =>
+        reactionTimeCount > 0
+            ? totalReactionTime /
+              reactionTimeCount
+            : 0f;
+
     private void Start()
     {
         UpdateDisplay();
@@ -50,42 +64,59 @@ public class PassFailCounter : MonoBehaviour
         UpdateDisplay();
     }
 
+    public void ResetCounter()
+    {
+        passes = 0;
+        fails = 0;
+        falsePositives = 0;
+        falseNegatives = 0;
+        totalReactionTime = 0f;
+        reactionTimeCount = 0;
+
+        UpdateDisplay();
+    }
+
     private void UpdateDisplay()
     {
         if (passText != null)
         {
-            passText.text = "Passes: " + passes;
+            passText.text =
+                "Passes: " + passes;
         }
 
         if (failText != null)
         {
-            failText.text = "Fails: " + fails;
+            failText.text =
+                "Fails: " + fails;
         }
 
         if (falsePositiveText != null)
         {
-            falsePositiveText.text = "False Positives: " + falsePositives;
+            falsePositiveText.text =
+                "False Positives: " +
+                falsePositives;
         }
 
         if (falseNegativeText != null)
         {
-            falseNegativeText.text = "False Negatives: " + falseNegatives;
+            falseNegativeText.text =
+                "False Negatives: " +
+                falseNegatives;
         }
 
         if (averageReactionTimeText != null)
         {
-            if (reactionTimeCount == 0)
+            if (!HasReactionTime)
             {
-                averageReactionTimeText.text = "Average Reaction: --";
+                averageReactionTimeText.text =
+                    "Average Reaction: --";
             }
             else
             {
-                float averageReactionTime =
-                    totalReactionTime / reactionTimeCount;
-
                 averageReactionTimeText.text =
                     "Average Reaction: " +
-                    averageReactionTime.ToString("F3") +
+                    AverageReactionTime
+                        .ToString("F3") +
                     " s";
             }
         }
