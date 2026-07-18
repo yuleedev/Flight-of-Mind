@@ -3872,7 +3872,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   cam: {fileID: 0}
-  playArea: {fileID: 0}
+  playArea: {fileID: 789139688}
   padding: 0
 --- !u!61 &1318330249
 BoxCollider2D:
