@@ -12,10 +12,8 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private float fallStartVelocity = 0f;
 
     [Header("Stacking size")]
-    [Tooltip("Leave at 0. The crate's real rendered height is measured automatically and " +
-             "accounts for Preserve Aspect letterboxing. Only set this above 0 if the PNG " +
-             "itself has baked-in transparent padding that measuring can't see.")]
-    [SerializeField] private float visualHeightOverride = 0f;
+    [Tooltip("How tall this crate's VISIBLE art is, in canvas pixels. The stack reserves exactly this much vertical space for the crate. Each crate needs its own value. Requires the crate's Scale to be (1,1,1).")]
+    [SerializeField] private float visualHeight = 180f;
 
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
@@ -26,9 +24,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private bool isFalling;
 
     public bool IsFalling => isFalling;
-
-
-    public float VisualHeight => visualHeightOverride > 0f ? visualHeightOverride : MeasureRenderedHeight();
+    public float VisualHeight => visualHeight;
 
     void Awake()
     {
@@ -44,54 +40,27 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private void NormalizeAnchors()
     {
-        Vector2 renderedSize = rectTransform.rect.size; // capture BEFORE touching anchors
+        Vector2 renderedSize = rectTransform.rect.size;
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-        rectTransform.pivot     = new Vector2(0.5f, 0.5f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
         rectTransform.sizeDelta = renderedSize;
     }
-
 
     private void StripPhysicsComponents()
     {
         var rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            Debug.LogWarning($"{name}: removed Rigidbody2D — this is Canvas UI positioned via RectTransform, not Physics2D.");
-            Destroy(rb);
-        }
+        if (rb != null) Destroy(rb);
+
         foreach (var col in GetComponents<Collider2D>())
-        {
-            Debug.LogWarning($"{name}: removed {col.GetType().Name} — drop detection runs via StackSlot.OverlapArea(), not Collider2D.");
             Destroy(col);
-        }
-    }
-
- 
-    private float MeasureRenderedHeight()
-    {
-        if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
-        float boxWidth  = rectTransform.rect.width;
-        float boxHeight = rectTransform.rect.height;
-
-        if (image == null) image = GetComponent<Image>();
-        if (image == null || image.sprite == null || !image.preserveAspect) return boxHeight;
-
-        Rect spriteRect = image.sprite.rect;
-        if (spriteRect.height <= 0f || boxHeight <= 0f) return boxHeight;
-
-        float spriteAspect = spriteRect.width / spriteRect.height;
-        float boxAspect    = boxWidth / boxHeight;
-
-
-        if (spriteAspect > boxAspect) return boxWidth / spriteAspect;
-
-        return boxHeight;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (thinkingTime.Instance != null) thinkingTime.Instance.StopTiming();
+
+        StackSlot.ClearAllHighlights();
 
         if (CargoLogisticsManager.Instance.IsGameOver) { isValidDrag = false; return; }
         if (isFalling) { isValidDrag = false; return; }
@@ -99,11 +68,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         startSlot = GetComponentInParent<StackSlot>();
         isValidDrag = startSlot != null && startSlot.Top == transform;
 
-        if (!isValidDrag)
-        {
-            Debug.Log($"{name}: can't drag — not the top item of its slot.");
-            return;
-        }
+        if (!isValidDrag) return;
 
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(canvas.transform, true);
@@ -113,6 +78,25 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     {
         if (!isValidDrag) return;
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        UpdateDropHighlight();
+    }
+
+    private void UpdateDropHighlight()
+    {
+        StackSlot hovered = GetMostOverlappingSlot();
+
+        for (int i = 0; i < StackSlot.All.Count; i++)
+        {
+            StackSlot slot = StackSlot.All[i];
+
+            if (slot != hovered || slot == startSlot)
+            {
+                slot.SetHighlight(false, false);
+                continue;
+            }
+
+            slot.SetHighlight(true, !slot.IsFull);
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -120,6 +104,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (!isValidDrag) return;
         isValidDrag = false;
         canvasGroup.blocksRaycasts = true;
+        StackSlot.ClearAllHighlights();
 
         StackSlot targetSlot = GetMostOverlappingSlot();
 
@@ -136,10 +121,8 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         StackSlot fromSlot = startSlot;
 
-        // worldPositionStays: true on purpose — the crate must stay visually where the player
-        // released it, then fall from there. Passing false would teleport it.
         transform.SetParent(targetSlot.transform, true);
-        transform.SetAsLastSibling(); // last sibling == top of the stack
+        transform.SetAsLastSibling();
 
         rectTransform.anchoredPosition = new Vector2(0f, rectTransform.anchoredPosition.y);
         float targetY = targetSlot.GetRestingYForTopItem();
@@ -155,7 +138,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private void ReturnToStart()
     {
         transform.SetParent(startSlot.transform, true);
-        transform.SetAsLastSibling(); // it was the top item, it goes back on top
+        transform.SetAsLastSibling();
 
         rectTransform.anchoredPosition = new Vector2(0f, rectTransform.anchoredPosition.y);
         float targetY = startSlot.GetRestingYForTopItem();

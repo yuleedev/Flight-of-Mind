@@ -17,7 +17,6 @@ public class TowerOfLondonProblem
 
 public static class ProblemLibrary
 {
-
     public static readonly List<List<string>> FixedStart = new List<List<string>>
     {
         new(){ "OrangeCargo", "WhiteCargo" },
@@ -25,8 +24,6 @@ public static class ProblemLibrary
         new(){ }
     };
 
-    // 1 practice trial (2 moves) + 12 scored trials (2,2,3,3,4,4,4,4,5,5,5,5),
-    //A:3 B:2 C:1
     public static readonly List<TowerOfLondonProblem> Sequence = new List<TowerOfLondonProblem>
     {
         new(new(){ new(){}, new(){"OrangeCargo","BlueCargo"}, new(){"WhiteCargo"} }, 2, isPractice: true),

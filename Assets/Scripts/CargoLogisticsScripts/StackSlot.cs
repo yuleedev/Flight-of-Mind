@@ -1,40 +1,74 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class StackSlot : MonoBehaviour
 {
     public static List<StackSlot> All = new List<StackSlot>();
 
-    [Tooltip("3 / 2 / 1 for Slot_A / Slot_B / Slot_C. Changing these silently invalidates " +
-             "every optimalMoves value baked into ProblemLibrary.")]
+    [Tooltip("3 / 2 / 1 for Slot_A / Slot_B / Slot_C. Changing these invalidates every optimalMoves value in ProblemLibrary.")]
     public int capacity = 3;
 
     [Header("Stacking layout")]
     [Tooltip("Extra space between crates. Keep at 0 for crates that physically touch.")]
     public float spacingGap = 0f;
+
     [Tooltip("Distance from the slot's bottom edge up to the floor the bottom crate rests on.")]
     public float bottomPadding = 0f;
 
-    private RectTransform rectTransform;
+    [Header("Drop highlight")]
+    [Tooltip("Must be a SIBLING object, never a child of this slot. Leave empty to disable.")]
+    [SerializeField] private GameObject highlight;
 
+    [SerializeField] private Color validColor = new Color(0.40f, 1.00f, 0.55f, 0.30f);
+    [SerializeField] private Color invalidColor = new Color(1.00f, 0.32f, 0.32f, 0.30f);
+
+    private RectTransform rectTransform;
+    private Image highlightImage;
 
     void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
 
         var rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            Destroy(rb);
-        }
+        if (rb != null) Destroy(rb);
+
         foreach (var col in GetComponents<Collider2D>())
-        {
             Destroy(col);
+    }
+
+    void OnEnable()
+    {
+        All.Add(this);
+
+        if (highlight != null)
+        {
+            highlightImage = highlight.GetComponent<Image>();
+            highlight.SetActive(false);
         }
     }
 
-    void OnEnable() => All.Add(this);
-    void OnDisable() => All.Remove(this);
+    void OnDisable()
+    {
+        All.Remove(this);
+        SetHighlight(false, false);
+    }
+
+    public void SetHighlight(bool on, bool valid)
+    {
+        if (highlight == null) return;
+
+        if (on && highlightImage != null)
+            highlightImage.color = valid ? validColor : invalidColor;
+
+        highlight.SetActive(on);
+    }
+
+    public static void ClearAllHighlights()
+    {
+        for (int i = 0; i < All.Count; i++)
+            All[i].SetHighlight(false, false);
+    }
 
     public Transform Top => transform.childCount > 0 ? transform.GetChild(transform.childCount - 1) : null;
     public bool IsFull => transform.childCount >= capacity;
@@ -67,13 +101,11 @@ public class StackSlot : MonoBehaviour
         return rt != null ? rt.rect.height : 0f;
     }
 
-
     private float FloorY()
     {
         if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
         return -rectTransform.rect.height * 0.5f + bottomPadding;
     }
-
 
     public void RestackItems()
     {
@@ -91,7 +123,6 @@ public class StackSlot : MonoBehaviour
             runningY += height + spacingGap;
         }
     }
-
 
     public float GetRestingYForTopItem()
     {
