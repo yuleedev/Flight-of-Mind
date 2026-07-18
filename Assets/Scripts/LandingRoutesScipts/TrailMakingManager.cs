@@ -41,6 +41,7 @@ public class TrailMakingManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        TrailMakingResults.Clear();
     }
 
     void Update()
@@ -194,6 +195,7 @@ public class TrailMakingManager : MonoBehaviour
         {
             timeA = total;
             errorsA = errors;
+            TrailMakingResults.Record("A", timeA, errorsA);
             if (readyPanel != null) readyPanel.SetActive(true);
 			if (timerText != null) timerText.gameObject.SetActive(false);
     		if (errorCountText != null) errorCountText.gameObject.SetActive(false);
@@ -202,6 +204,7 @@ public class TrailMakingManager : MonoBehaviour
 		{
     		timeB = total;
     		errorsB = errors;
+    		TrailMakingResults.Record("B", timeB, errorsB);
     		ShowResults();
     		Invoke(nameof(GoToCargo), nextSceneDelay);
 		}
