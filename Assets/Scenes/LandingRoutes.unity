@@ -5657,7 +5657,6 @@ GameObject:
   - component: {fileID: 1727463583}
   - component: {fileID: 1727463585}
   - component: {fileID: 1727463584}
-  - component: {fileID: 1727463586}
   m_Layer: 5
   m_Name: MessagePanel
   m_TagString: Untagged
@@ -5723,20 +5722,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1727463582}
   m_CullTransparentMesh: 1
---- !u!114 &1727463586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1727463582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b864df7ac82ec4090b362850beb428b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MessagePanelAnimator
-  duration: 0.55
-  slideDistance: 400
 --- !u!1001 &1738101313
 PrefabInstance:
   m_ObjectHideFlags: 0
