@@ -34,6 +34,17 @@ public class RadarPivot : MonoBehaviour
 
     [SerializeField] private PassFailCounter passFailCounter;
 
+    [Header("Scoring")]
+    [SerializeField, Range(0f, 1f)] private float accuracyWeight = 0.60f;
+    [SerializeField, Range(0f, 1f)] private float falsePositiveWeight = 0.15f;
+    [SerializeField, Range(0f, 1f)] private float falseNegativeWeight = 0.15f;
+    [SerializeField, Range(0f, 1f)] private float reactionTimeWeight = 0.10f;
+    [SerializeField] private float excellentReactionTime = 0.35f;
+    [SerializeField] private float poorReactionTime = 1.50f;
+
+    public int FinalScore { get; private set; }
+    public string FinalRank { get; private set; } = "F";
+
     private float degreesRotated;
     private float flashTimer;
     private float rotationStartTime;
@@ -65,6 +76,8 @@ public class RadarPivot : MonoBehaviour
         transitionTimer = 0f;
         temporaryMessageTimer = 0f;
         tutorialSweepIndex = 0;
+        FinalScore = 0;
+        FinalRank = "F";
 
         gameStarted = false;
         gameFinished = false;
@@ -117,6 +130,8 @@ public class RadarPivot : MonoBehaviour
         transitionTimer = 0f;
         temporaryMessageTimer = 0f;
         tutorialSweepIndex = 0;
+        FinalScore = 0;
+        FinalRank = "F";
 
         pressedThisRotation = false;
         warningActive = false;
@@ -574,9 +589,16 @@ public class RadarPivot : MonoBehaviour
                     .ToString("F3") + " s"
                 : "--";
 
+        FinalScore = CalculateFinalScore();
+        FinalRank = GetRank(FinalScore);
+
         completionText.text =
             "Radar Watch Complete\n\n" +
-            "Passes: " +
+            "Score: " +
+            FinalScore +
+            "/100\nRank: " +
+            FinalRank +
+            "\n\nPasses: " +
             passFailCounter.Passes +
             "\nFails: " +
             passFailCounter.Fails +
@@ -586,6 +608,107 @@ public class RadarPivot : MonoBehaviour
             passFailCounter.FalseNegatives +
             "\nAverage Reaction: " +
             averageReaction;
+    }
+
+    private int CalculateFinalScore()
+    {
+        if (passFailCounter == null)
+        {
+            return 0;
+        }
+
+        int totalRounds =
+            passFailCounter.Passes +
+            passFailCounter.Fails;
+
+        if (totalRounds <= 0)
+        {
+            return 0;
+        }
+
+        float accuracyScore =
+            (float)passFailCounter.Passes /
+            totalRounds * 100f;
+
+        float falsePositiveScore =
+            100f -
+            ((float)passFailCounter.FalsePositives /
+            totalRounds * 100f);
+
+        float falseNegativeScore =
+            100f -
+            ((float)passFailCounter.FalseNegatives /
+            totalRounds * 100f);
+
+        float reactionScore = 0f;
+
+        if (passFailCounter.HasReactionTime)
+        {
+            float reactionRange =
+                Mathf.Max(
+                    0.01f,
+                    poorReactionTime - excellentReactionTime
+                );
+
+            reactionScore =
+                Mathf.Clamp01(
+                    (poorReactionTime -
+                    passFailCounter.AverageReactionTime) /
+                    reactionRange
+                ) * 100f;
+        }
+
+        float totalWeight =
+            accuracyWeight +
+            falsePositiveWeight +
+            falseNegativeWeight +
+            reactionTimeWeight;
+
+        if (totalWeight <= 0f)
+        {
+            return 0;
+        }
+
+        float weightedScore =
+            (accuracyScore * accuracyWeight +
+            falsePositiveScore * falsePositiveWeight +
+            falseNegativeScore * falseNegativeWeight +
+            reactionScore * reactionTimeWeight) /
+            totalWeight;
+
+        return Mathf.RoundToInt(
+            Mathf.Clamp(weightedScore, 0f, 100f)
+        );
+    }
+
+    private string GetRank(int score)
+    {
+        if (score >= 95)
+        {
+            return "S";
+        }
+
+        if (score >= 85)
+        {
+            return "A";
+        }
+
+        if (score >= 75)
+        {
+            return "B";
+        }
+
+        if (score >= 65)
+        {
+            return "C";
+        }
+
+        if (score >= 55)
+        {
+            return "D";
+        }
+
+        return "F";
     }
 
     private void UpdateTemporaryMessage()
