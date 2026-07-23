@@ -8,6 +8,11 @@ public class ResultDisplay
 
     public static void Show(Canvas canvas, string message)
     {
+        BuildPanel(canvas, message, 80f, 32f);
+    }
+
+    private static void BuildPanel(Canvas canvas, string message, float height, float fontSize)
+    {
         if (activePanel != null) Object.Destroy(activePanel);
 
         GameObject panel = new GameObject("ResultPanel", typeof(RectTransform));
@@ -17,7 +22,7 @@ public class ResultDisplay
         rt.anchorMax = new Vector2(0.5f, 0f);
         rt.pivot = new Vector2(0.5f, 0f);
         rt.anchoredPosition = new Vector2(0f, 30f);
-        rt.sizeDelta = new Vector2(700f, 80f);
+        rt.sizeDelta = new Vector2(700f, height);
 
         panel.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.65f);
 
@@ -29,7 +34,7 @@ public class ResultDisplay
         textRt.sizeDelta = Vector2.zero;
 
         var text = textGo.AddComponent<TextMeshProUGUI>();
-        text.fontSize = 32f;
+        text.fontSize = fontSize;
         text.alignment = TextAlignmentOptions.Center;
         text.text = message;
 

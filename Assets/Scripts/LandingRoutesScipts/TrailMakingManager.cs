@@ -249,7 +249,12 @@ public class TrailMakingManager : MonoBehaviour
         }
         else
         {
-            return ((char)('A' + index / 2)).ToString();
+            char letter = (char)('A' + index / 2);
+            if (letter == 'I')
+            {
+                return "i";
+            }
+            return letter.ToString();
         }
     }
 

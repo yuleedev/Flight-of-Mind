@@ -33,15 +33,14 @@ public class PlaneDragger : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (col.OverlapPoint(mousePos))
+            if (drawing)
+            {
+                drawing = false;
+            }
+            else if (col.OverlapPoint(mousePos))
             {
                 drawing = true;
             }
-        }
-
-        if (Mouse.current.leftButton.wasReleasedThisFrame)
-        {
-            drawing = false;
         }
 
         if (drawing)
