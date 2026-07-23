@@ -29,6 +29,12 @@ public class CargoLogisticsManager : MonoBehaviour
     [Header("Instructions")]
     [SerializeField] private GameObject startPanel;
 
+    [Header("Thinking Time Scoring")]
+    [Tooltip("Base seconds every problem gets, before adding time for its difficulty. See CargoLogistics_ScoringMethodology.txt.")]
+    [SerializeField] private float baseThinkingSeconds = 3f;
+    [Tooltip("Extra expected seconds added per optimal move. Raise if players are losing points while thinking at a normal pace; lower if the score is trivially maxed out.")]
+    [SerializeField] private float secondsPerOptimalMove = 4f;
+
     private Canvas canvas;
     private int moveCount = 0;
     private int currentProblemIndex = -1;
@@ -39,7 +45,7 @@ public class CargoLogisticsManager : MonoBehaviour
 
     public bool IsGameOver => sessionComplete;
 
-    void Awake()
+void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -48,6 +54,8 @@ public class CargoLogisticsManager : MonoBehaviour
         }
         Instance = this;
         canvas = FindAnyObjectByType<Canvas>();
+
+        CargoLogisticsScoring.Configure(baseThinkingSeconds, secondsPerOptimalMove);
     }
 
     void Start()
@@ -139,7 +147,7 @@ public class CargoLogisticsManager : MonoBehaviour
         return true;
     }
 
-    private void OnProblemSolved()
+   private void OnProblemSolved()
     {
         TowerOfLondonProblem problem = ProblemLibrary.Sequence[currentProblemIndex];
         bool isLastProblem = currentProblemIndex == ProblemLibrary.Sequence.Count - 1;
@@ -147,18 +155,19 @@ public class CargoLogisticsManager : MonoBehaviour
         float thinkTime = thinkingTime.Instance != null ? thinkingTime.Instance.ThinkingTimeSeconds : 0f;
         CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves, thinkTime);
 
-        Debug.Log($"Trial {currentProblemIndex}: {moveCount} moves ({moveCount - currentOptimalMoves} excess), {thinkTime:F2}s to first move");
-
         string message;
         if (problem.isPractice)
             message = "Practice complete! Starting the timed problems...";
         else if (isLastProblem)
-            message = $"All problems complete! Last one solved in {moveCount} moves (optimal was {currentOptimalMoves}).";
+            message = "All problems complete!";
         else
             message = $"Solved in {moveCount} moves (optimal was {currentOptimalMoves}).";
 
         ResultDisplay.Show(canvas, message);
         Time.timeScale = 0f;
+
+        if (isLastProblem)
+            CargoLogisticsScoring.ComputeFinalScores();
 
         StartCoroutine(AdvanceAfterDelay(2f, isLastProblem));
     }
