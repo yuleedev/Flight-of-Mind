@@ -9,15 +9,19 @@ public class TrailMakingManager : MonoBehaviour
     public static TrailMakingManager Instance;
 
     public TestPart part = TestPart.A;
+    public Waypoint[] routeTutorial;
     public Waypoint[] routeA;
     public Waypoint[] routeB;
     public Transform plane;
     public LineRenderer trail;
 
 	public Vector2 planeStartOffset = new Vector2(0f, -4f);
+    public Vector2 tutorialPlaneStart = new Vector2(-8.05f, -2.61f);
+    public GameObject tutorialObjects;
     public GameObject partAObjects;
     public GameObject partBObjects;
 	public GameObject startPanel;
+    public GameObject tutorialDonePanel;
     public GameObject readyPanel;
     public GameObject messagePanel;
 
@@ -31,6 +35,7 @@ public class TrailMakingManager : MonoBehaviour
     int errors;
     float startTime;
     bool finished;
+    bool inTutorial;
     Waypoint lastWaypointOver;
 
     float timeA;
@@ -65,13 +70,12 @@ public class TrailMakingManager : MonoBehaviour
 	{
     	if (partBObjects != null) partBObjects.SetActive(false);
     	if (readyPanel != null) readyPanel.SetActive(false);
+    	if (tutorialDonePanel != null) tutorialDonePanel.SetActive(false);
 
-    	part = TestPart.A;
-    	route = routeA;
     	finished = true;
 
     	if (startPanel != null) startPanel.SetActive(true);
-    	else SetupRound();
+    	else StartTutorial();
 	}
 
     void SetupRound()
@@ -87,12 +91,20 @@ public class TrailMakingManager : MonoBehaviour
             route[i].ResetColor();
         }
 
-        plane.position = route[0].transform.position + (Vector3)planeStartOffset;
-        route[0].MarkVisited();
-        currentIndex = 1;
+        if (inTutorial)
+        {
+            plane.position = tutorialPlaneStart;
+            currentIndex = 0;
+        }
+        else
+        {
+            plane.position = route[0].transform.position + (Vector3)planeStartOffset;
+            route[0].MarkVisited();
+            currentIndex = 1;
+        }
 
         trail.positionCount = 1;
-        trail.SetPosition(0, route[0].transform.position);
+        trail.SetPosition(0, plane.position);
 
         startTime = Time.time;
 
@@ -104,8 +116,52 @@ public class TrailMakingManager : MonoBehaviour
 	public void OnStartClicked()
 	{
     	if (startPanel != null) startPanel.SetActive(false);
-    	SetupRound();
+    	StartTutorial();
 	}
+
+    void StartTutorial()
+    {
+        if (routeTutorial == null || routeTutorial.Length == 0)
+        {
+            StartPartA();
+            return;
+        }
+
+        inTutorial = true;
+        part = TestPart.A;
+        route = routeTutorial;
+
+        if (tutorialObjects != null) tutorialObjects.SetActive(true);
+        if (partAObjects != null) partAObjects.SetActive(false);
+        if (partBObjects != null) partBObjects.SetActive(false);
+
+        if (timerText != null) timerText.gameObject.SetActive(false);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+
+        SetupRound();
+    }
+
+    public void OnTutorialDoneClicked()
+    {
+        if (tutorialDonePanel != null) tutorialDonePanel.SetActive(false);
+        StartPartA();
+    }
+
+    void StartPartA()
+    {
+        inTutorial = false;
+        part = TestPart.A;
+        route = routeA;
+
+        if (tutorialObjects != null) tutorialObjects.SetActive(false);
+        if (partAObjects != null) partAObjects.SetActive(true);
+        if (partBObjects != null) partBObjects.SetActive(false);
+
+        if (timerText != null) timerText.gameObject.SetActive(true);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(true);
+
+        SetupRound();
+    }
 
     public void OnReadyClicked()
 	{
@@ -190,6 +246,16 @@ public class TrailMakingManager : MonoBehaviour
         float total = Time.time - startTime;
 
         if (timerText != null) timerText.text = "Time: " + total.ToString("F1") + "s";
+
+        if (inTutorial)
+        {
+            if (timerText != null) timerText.gameObject.SetActive(false);
+            if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+            if (tutorialObjects != null) tutorialObjects.SetActive(false);
+            if (tutorialDonePanel != null) tutorialDonePanel.SetActive(true);
+            else StartPartA();
+            return;
+        }
 
         if (part == TestPart.A)
         {
