@@ -205,6 +205,7 @@ public class TrailMakingManager : MonoBehaviour
     		timeB = total;
     		errorsB = errors;
     		TrailMakingResults.Record("B", timeB, errorsB);
+    		TrailMakingResults.LogResults();
     		ShowResults();
     		Invoke(nameof(GoToCargo), nextSceneDelay);
 		}
@@ -214,9 +215,14 @@ public class TrailMakingManager : MonoBehaviour
     {
         if (resultText != null)
         {
+            float difference = timeB - timeA;
+            float ratio = timeA > 0f ? timeB / timeA : 0f;
+
             resultText.text =
                 "Part A: " + timeA.ToString("F1") + "s, " + errorsA + " errors\n" +
-                "Part B: " + timeB.ToString("F1") + "s, " + errorsB + " errors";
+                "Part B: " + timeB.ToString("F1") + "s, " + errorsB + " errors\n\n" +
+                "B - A: " + difference.ToString("F1") + "s\n" +
+                "B / A: " + ratio.ToString("F2");
         }
     }
 
