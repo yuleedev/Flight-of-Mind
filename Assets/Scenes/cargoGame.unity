@@ -209,7 +209,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DraggableCargo
   fallGravity: 2500
   fallStartVelocity: 0
+  bounciness: 0.35
+  minBounceSpeed: 60
+  maxBounces: 8
   visualHeight: 190
+  fallSound: {fileID: 0}
+  collisionSound: {fileID: 8300000, guid: b556b077df6bc4b958caae84f29ec275, type: 3}
+  referenceImpactSpeed: 1400
+  maxCollisionVolume: 0.85
+  fallSoundVolume: 0.6
 --- !u!1 &270521287
 GameObject:
   m_ObjectHideFlags: 0
@@ -1240,7 +1248,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DraggableCargo
   fallGravity: 2500
   fallStartVelocity: 0
+  bounciness: 0.35
+  minBounceSpeed: 60
+  maxBounces: 8
   visualHeight: 300
+  fallSound: {fileID: 8300000, guid: fbfa70580cb0149278f66f4944fa3a5e, type: 3}
+  collisionSound: {fileID: 8300000, guid: b556b077df6bc4b958caae84f29ec275, type: 3}
+  referenceImpactSpeed: 1400
+  maxCollisionVolume: 0.85
+  fallSoundVolume: 0.6
 --- !u!1 &1087090273
 GameObject:
   m_ObjectHideFlags: 0
@@ -1577,6 +1593,8 @@ MonoBehaviour:
   - {fileID: 280908074}
   - {fileID: 695764296}
   startPanel: {fileID: 1307316701}
+  baseThinkingSeconds: 3
+  secondsPerOptimalMove: 4
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0
@@ -1771,7 +1789,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DraggableCargo
   fallGravity: 2500
   fallStartVelocity: 0
+  bounciness: 0.35
+  minBounceSpeed: 60
+  maxBounces: 8
   visualHeight: 189
+  fallSound: {fileID: 0}
+  collisionSound: {fileID: 8300000, guid: b556b077df6bc4b958caae84f29ec275, type: 3}
+  referenceImpactSpeed: 1400
+  maxCollisionVolume: 0.85
+  fallSoundVolume: 0.6
 --- !u!1 &1545744770
 GameObject:
   m_ObjectHideFlags: 0
