@@ -135,8 +135,8 @@ public class TrailMakingManager : MonoBehaviour
         if (partAObjects != null) partAObjects.SetActive(false);
         if (partBObjects != null) partBObjects.SetActive(false);
 
-        if (timerText != null) timerText.gameObject.SetActive(false);
-        if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+        if (timerText != null) timerText.gameObject.SetActive(true);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(true);
 
         SetupRound();
     }
