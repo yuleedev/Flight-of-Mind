@@ -9,6 +9,11 @@ public class PassFailCounter : MonoBehaviour
     [SerializeField] private TMP_Text falseNegativeText;
     [SerializeField] private TMP_Text averageReactionTimeText;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip correctSound;
+    [SerializeField] private AudioClip incorrectSound;
+
     private int passes;
     private int fails;
     private int falsePositives;
@@ -39,6 +44,7 @@ public class PassFailCounter : MonoBehaviour
     public void AddPass()
     {
         passes++;
+        PlaySound(correctSound);
         UpdateDisplay();
     }
 
@@ -47,6 +53,7 @@ public class PassFailCounter : MonoBehaviour
         passes++;
         totalReactionTime += reactionTime;
         reactionTimeCount++;
+        PlaySound(correctSound);
         UpdateDisplay();
     }
 
@@ -54,6 +61,7 @@ public class PassFailCounter : MonoBehaviour
     {
         fails++;
         falsePositives++;
+        PlaySound(incorrectSound);
         UpdateDisplay();
     }
 
@@ -74,6 +82,12 @@ public class PassFailCounter : MonoBehaviour
         reactionTimeCount = 0;
 
         UpdateDisplay();
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (sfxSource == null || clip == null) return;
+        sfxSource.PlayOneShot(clip);
     }
 
     private void UpdateDisplay()
