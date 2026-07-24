@@ -11,15 +11,36 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private float fallGravity = 2500f;
     [SerializeField] private float fallStartVelocity = 0f;
 
+    [Header("Bounce physics")]
+    [Tooltip("Coefficient of restitution: fraction of impact speed kept after each bounce. Real wood-on-wood crates are not very elastic - 0.2 to 0.4 looks right. 0 = no bounce (old behavior). 1 = bounces forever (unrealistic, avoid).")]
+    [SerializeField, Range(0f, 1f)] private float bounciness = 0.35f;
+    [Tooltip("Once the rebound speed after an impact would drop below this (pixels/second), the crate is considered settled and stops bouncing instead of doing an imperceptible micro-bounce.")]
+    [SerializeField] private float minBounceSpeed = 60f;
+    [Tooltip("Hard safety cap on bounce count, in case of an unusually large starting velocity.")]
+    [SerializeField] private int maxBounces = 8;
+
     [Header("Stacking size")]
     [Tooltip("How tall this crate's VISIBLE art is, in canvas pixels. The stack reserves exactly this much vertical space for the crate. Each crate needs its own value. Requires the crate's Scale to be (1,1,1).")]
     [SerializeField] private float visualHeight = 180f;
+
+    [Header("Sound Effects")]
+    [Tooltip("Short whoosh/drop sound played once when the crate is released and starts falling. Leave empty for no sound - the game works fine either way.")]
+    [SerializeField] private AudioClip fallSound;
+    [Tooltip("Wood-on-wood impact sound played on landing and again on every bounce after it. Leave empty for no sound.")]
+    [SerializeField] private AudioClip collisionSound;
+    [Tooltip("Impact speed (pixels/second) at or above which the collision sound plays at Max Collision Volume. Softer impacts (later, smaller bounces) scale down from this automatically.")]
+    [SerializeField] private float referenceImpactSpeed = 1400f;
+    [Tooltip("Volume the collision sound plays at when impact speed >= Reference Impact Speed.")]
+    [SerializeField, Range(0f, 1f)] private float maxCollisionVolume = 0.85f;
+    [Tooltip("Volume the fall/whoosh sound plays at.")]
+    [SerializeField, Range(0f, 1f)] private float fallSoundVolume = 0.6f;
 
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Canvas canvas;
     private Image image;
     private StackSlot startSlot;
+    private AudioSource audioSource;
     private bool isValidDrag;
     private bool isFalling;
 
@@ -33,6 +54,11 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f; // 2D UI sound, not positioned in world space
 
         NormalizeAnchors();
         StripPhysicsComponents();
@@ -145,24 +171,61 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         StartCoroutine(FallToPosition(targetY, () => startSlot.RestackItems()));
     }
-
     private IEnumerator FallToPosition(float targetY, Action onLanded)
     {
         isFalling = true;
-        float velocity = fallStartVelocity;
 
-        while (rectTransform.anchoredPosition.y > targetY)
+        PlaySound(fallSound, fallSoundVolume);
+
+        float y = rectTransform.anchoredPosition.y;
+        float velocityY = -Mathf.Abs(fallStartVelocity);
+        int bounceCount = 0;
+
+        while (true)
         {
-            velocity += fallGravity * Time.deltaTime;
-            float newY = rectTransform.anchoredPosition.y - velocity * Time.deltaTime;
-            if (newY <= targetY) newY = targetY;
-            rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, newY);
+            velocityY -= fallGravity * Time.deltaTime;
+            y += velocityY * Time.deltaTime;
+
+            if (y <= targetY)
+            {
+                y = targetY;
+                float impactSpeed = -velocityY; 
+
+                bool canStillBounce = bounceCount < maxBounces && impactSpeed * bounciness > minBounceSpeed;
+
+                PlaySound(collisionSound, ImpactVolume(impactSpeed));
+
+                if (canStillBounce)
+                {
+                    velocityY = impactSpeed * bounciness;
+                    bounceCount++;
+                }
+                else
+                {
+                    velocityY = 0f;
+                    rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, y);
+                    break;
+                }
+            }
+
+            rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, y);
             yield return null;
         }
 
-        rectTransform.anchoredPosition = new Vector2(0f, targetY);
         isFalling = false;
         onLanded?.Invoke();
+    }
+
+    private float ImpactVolume(float impactSpeed)
+    {
+        float t = Mathf.Clamp01(impactSpeed / Mathf.Max(1f, referenceImpactSpeed));
+        return t * maxCollisionVolume;
+    }
+
+    private void PlaySound(AudioClip clip, float volume)
+    {
+        if (clip == null || audioSource == null) return;
+        audioSource.PlayOneShot(clip, volume);
     }
 
     private StackSlot GetMostOverlappingSlot()
