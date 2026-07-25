@@ -86,6 +86,8 @@ public class PassFailCounter : MonoBehaviour
 
     private void PlaySound(AudioClip clip)
     {
+
+
         if (sfxSource == null || clip == null) return;
         sfxSource.PlayOneShot(clip);
     }
