@@ -30,10 +30,18 @@ public class CargoLogisticsManager : MonoBehaviour
     [SerializeField] private GameObject startPanel;
 
     [Header("Thinking Time Scoring")]
-    [Tooltip("Base seconds every problem gets, before adding time for its difficulty. See CargoLogistics_ScoringMethodology.txt.")]
+    [Tooltip("Base expected deliberation seconds for any problem, before difficulty is added.")]
     [SerializeField] private float baseThinkingSeconds = 3f;
-    [Tooltip("Extra expected seconds added per optimal move. Raise if players are losing points while thinking at a normal pace; lower if the score is trivially maxed out.")]
+    [Tooltip("Expected deliberation seconds added per optimal move.")]
     [SerializeField] private float secondsPerOptimalMove = 4f;
+    [Tooltip("How steeply the reasoning score falls as excess moves accumulate. Higher = harsher.")]
+    [SerializeField] private float errorDecay = 1.6f;
+    [Tooltip("Cost multiplier on pre-first-move planning. Below 1 rewards planning before acting.")]
+    [SerializeField] private float initialThinkingWeight = 0.6f;
+    [Tooltip("Cost multiplier on mid-solve hesitation. Above 1 penalizes re-planning after a bad first move.")]
+    [SerializeField] private float subsequentThinkingWeight = 1.4f;
+    [Tooltip("Curve steepness for the deliberation score. On-pace perfect solve lands near 80/100 at 1.1.")]
+    [SerializeField] private float paceSensitivity = 1.1f;
 
     private Canvas canvas;
     private int moveCount = 0;
@@ -55,7 +63,8 @@ void Awake()
         Instance = this;
         canvas = FindAnyObjectByType<Canvas>();
 
-        CargoLogisticsScoring.Configure(baseThinkingSeconds, secondsPerOptimalMove);
+       CargoLogisticsScoring.Configure(baseThinkingSeconds, secondsPerOptimalMove, errorDecay,
+                                        initialThinkingWeight, subsequentThinkingWeight, paceSensitivity);
     }
 
     void Start()
@@ -128,6 +137,17 @@ void Awake()
         moveCount++;
         moveCounter.SetMoves(moveCount);
 
+        if (thinkingTime.Instance != null)
+        {
+            CargoLogisticsScoring.LogMove(
+                currentProblemIndex,
+                ProblemLibrary.Sequence[currentProblemIndex].isPractice,
+                moveCount,
+                currentOptimalMoves,
+                thinkingTime.Instance.InitialThinkingSeconds,
+                thinkingTime.Instance.LiveSubsequentThinkingSeconds);
+        }
+
         if (IsSolved())
         {
             problemSolved = true;
@@ -147,13 +167,20 @@ void Awake()
         return true;
     }
 
-   private void OnProblemSolved()
+private void OnProblemSolved()
     {
         TowerOfLondonProblem problem = ProblemLibrary.Sequence[currentProblemIndex];
         bool isLastProblem = currentProblemIndex == ProblemLibrary.Sequence.Count - 1;
 
-        float thinkTime = thinkingTime.Instance != null ? thinkingTime.Instance.ThinkingTimeSeconds : 0f;
-        CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves, thinkTime);
+        if (thinkingTime.Instance != null) thinkingTime.Instance.OnTrialSolved();
+
+        float initial = thinkingTime.Instance != null ? thinkingTime.Instance.InitialThinkingSeconds : 0f;
+        float subsequent = thinkingTime.Instance != null ? thinkingTime.Instance.SubsequentThinkingSeconds : 0f;
+        float animation = thinkingTime.Instance != null ? thinkingTime.Instance.AnimationSeconds : 0f;
+        float total = thinkingTime.Instance != null ? thinkingTime.Instance.TotalSeconds : 0f;
+
+        CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves,
+                                     initial, subsequent, animation, total);
 
         string message;
         if (problem.isPractice)

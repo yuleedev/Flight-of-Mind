@@ -174,7 +174,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private IEnumerator FallToPosition(float targetY, Action onLanded)
     {
         isFalling = true;
-
+        if (thinkingTime.Instance != null) thinkingTime.Instance.OnAnimationStarted();
         PlaySound(fallSound, fallSoundVolume);
 
         float y = rectTransform.anchoredPosition.y;
@@ -213,6 +213,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
 
         isFalling = false;
+         if (thinkingTime.Instance != null) thinkingTime.Instance.OnAnimationEnded();
         onLanded?.Invoke();
     }
 
