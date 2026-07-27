@@ -11,10 +11,6 @@ public class thinkingTime : MonoBehaviour
     public bool HasStoppedTiming { get; private set; }
 
     public float ThinkingTimeSeconds => InitialThinkingSeconds;
-
-    private float trialStart;
-    private float animationStart;
-    private int animationsRunning;
     public float LiveTotalSeconds => Time.unscaledTime - trialStart;
 
     public float LiveSubsequentThinkingSeconds
@@ -27,6 +23,10 @@ public class thinkingTime : MonoBehaviour
             return Mathf.Max(0f, LiveTotalSeconds - InitialThinkingSeconds - animationSoFar);
         }
     }
+
+    private float trialStart;
+    private float animationStart;
+    private int animationsRunning;
 
     void Awake()
     {

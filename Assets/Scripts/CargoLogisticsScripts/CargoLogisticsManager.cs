@@ -29,19 +29,9 @@ public class CargoLogisticsManager : MonoBehaviour
     [Header("Instructions")]
     [SerializeField] private GameObject startPanel;
 
-    [Header("Thinking Time Scoring")]
-    [Tooltip("Base expected deliberation seconds for any problem, before difficulty is added.")]
-    [SerializeField] private float baseThinkingSeconds = 3f;
-    [Tooltip("Expected deliberation seconds added per optimal move.")]
-    [SerializeField] private float secondsPerOptimalMove = 4f;
-    [Tooltip("How steeply the reasoning score falls as excess moves accumulate. Higher = harsher.")]
-    [SerializeField] private float errorDecay = 1.6f;
-    [Tooltip("Cost multiplier on pre-first-move planning. Below 1 rewards planning before acting.")]
-    [SerializeField] private float initialThinkingWeight = 0.6f;
-    [Tooltip("Cost multiplier on mid-solve hesitation. Above 1 penalizes re-planning after a bad first move.")]
-    [SerializeField] private float subsequentThinkingWeight = 1.4f;
-    [Tooltip("Curve steepness for the deliberation score. On-pace perfect solve lands near 80/100 at 1.1.")]
-    [SerializeField] private float paceSensitivity = 1.1f;
+    [Header("Participant")]
+    [Tooltip("Fallback only. Ignored if an earlier scene already called CargoLogisticsNorms.SetAge.")]
+    [SerializeField] private int participantAge = 30;
 
     private Canvas canvas;
     private int moveCount = 0;
@@ -63,8 +53,8 @@ void Awake()
         Instance = this;
         canvas = FindAnyObjectByType<Canvas>();
 
-       CargoLogisticsScoring.Configure(baseThinkingSeconds, secondsPerOptimalMove, errorDecay,
-                                        initialThinkingWeight, subsequentThinkingWeight, paceSensitivity);
+        if (!CargoLogisticsNorms.AgeSet)
+            CargoLogisticsNorms.SetAge(participantAge);
     }
 
     void Start()
@@ -167,7 +157,7 @@ void Awake()
         return true;
     }
 
-private void OnProblemSolved()
+   private void OnProblemSolved()
     {
         TowerOfLondonProblem problem = ProblemLibrary.Sequence[currentProblemIndex];
         bool isLastProblem = currentProblemIndex == ProblemLibrary.Sequence.Count - 1;

@@ -1593,8 +1593,7 @@ MonoBehaviour:
   - {fileID: 280908074}
   - {fileID: 695764296}
   startPanel: {fileID: 1307316701}
-  baseThinkingSeconds: 3
-  secondsPerOptimalMove: 4
+  participantAge: 67
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0
