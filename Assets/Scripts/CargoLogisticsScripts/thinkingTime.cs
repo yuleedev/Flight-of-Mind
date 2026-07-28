@@ -60,7 +60,6 @@ public class thinkingTime : MonoBehaviour
 
         HasStoppedTiming = true;
         InitialThinkingSeconds = Time.unscaledTime - trialStart;
-        Debug.Log($"initial_thinking_time: {InitialThinkingSeconds:F2}s");
     }
 
     public void OnAnimationStarted()

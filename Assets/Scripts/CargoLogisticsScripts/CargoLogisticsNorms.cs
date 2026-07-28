@@ -5,28 +5,27 @@ public struct AgeNorm
 {
     public string label;
     public int maxAge;
+    public float planningMidpoint;
     public float baseSeconds;
     public float secondsPerMove;
-    public float errorDecay;
 }
 
 public static class CargoLogisticsNorms
 {
     public static readonly AgeNorm[] Groups =
     {
-        new AgeNorm { label = "6-8",   maxAge = 8,   baseSeconds = 6.30f, secondsPerMove = 8.40f, errorDecay = 0.80f },
-        new AgeNorm { label = "9-11",  maxAge = 11,  baseSeconds = 5.25f, secondsPerMove = 7.00f, errorDecay = 0.95f },
-        new AgeNorm { label = "12-14", maxAge = 14,  baseSeconds = 4.35f, secondsPerMove = 5.80f, errorDecay = 1.15f },
-        new AgeNorm { label = "15-17", maxAge = 17,  baseSeconds = 3.60f, secondsPerMove = 4.80f, errorDecay = 1.40f },
-        new AgeNorm { label = "18-24", maxAge = 24,  baseSeconds = 3.15f, secondsPerMove = 4.20f, errorDecay = 1.55f },
-        new AgeNorm { label = "25-34", maxAge = 34,  baseSeconds = 3.00f, secondsPerMove = 4.00f, errorDecay = 1.60f },
-        new AgeNorm { label = "35-44", maxAge = 44,  baseSeconds = 3.15f, secondsPerMove = 4.20f, errorDecay = 1.55f },
-        new AgeNorm { label = "45-54", maxAge = 54,  baseSeconds = 3.45f, secondsPerMove = 4.60f, errorDecay = 1.45f },
-        new AgeNorm { label = "55-64", maxAge = 64,  baseSeconds = 4.05f, secondsPerMove = 5.40f, errorDecay = 1.30f },
-        new AgeNorm { label = "65+",   maxAge = 120, baseSeconds = 4.95f, secondsPerMove = 6.60f, errorDecay = 1.10f },
+        new AgeNorm { label = "5-8",   maxAge = 8,   planningMidpoint = 2.20f, baseSeconds = 6.41f, secondsPerMove = 8.55f },
+        new AgeNorm { label = "9-11",  maxAge = 11,  planningMidpoint = 2.80f, baseSeconds = 5.34f, secondsPerMove = 7.12f },
+        new AgeNorm { label = "12-14", maxAge = 14,  planningMidpoint = 3.40f, baseSeconds = 4.42f, secondsPerMove = 5.90f },
+        new AgeNorm { label = "15-19", maxAge = 19,  planningMidpoint = 3.95f, baseSeconds = 3.60f, secondsPerMove = 4.80f },
+        new AgeNorm { label = "20-34", maxAge = 34,  planningMidpoint = 4.27f, baseSeconds = 3.05f, secondsPerMove = 4.07f },
+        new AgeNorm { label = "35-49", maxAge = 49,  planningMidpoint = 4.13f, baseSeconds = 3.23f, secondsPerMove = 4.31f },
+        new AgeNorm { label = "50-64", maxAge = 64,  planningMidpoint = 3.80f, baseSeconds = 3.72f, secondsPerMove = 4.97f },
+        new AgeNorm { label = "65-79", maxAge = 79,  planningMidpoint = 3.40f, baseSeconds = 4.58f, secondsPerMove = 6.11f },
+        new AgeNorm { label = "80+",   maxAge = 120, planningMidpoint = 2.90f, baseSeconds = 5.64f, secondsPerMove = 7.53f },
     };
 
-    public const int ReferenceGroupIndex = 5;
+    public const int ReferenceGroupIndex = 4;
 
     public static int CurrentGroupIndex { get; private set; } = ReferenceGroupIndex;
     public static bool AgeSet { get; private set; }

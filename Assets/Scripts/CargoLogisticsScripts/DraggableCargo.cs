@@ -94,7 +94,11 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         startSlot = GetComponentInParent<StackSlot>();
         isValidDrag = startSlot != null && startSlot.Top == transform;
 
-        if (!isValidDrag) return;
+        if (!isValidDrag)
+        {
+            if (startSlot != null) CargoLogisticsManager.Instance.RegisterRuleViolation();
+            return;
+        }
 
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(canvas.transform, true);
@@ -141,6 +145,9 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         if (!isValidDrop)
         {
+            if (targetSlot != null && targetSlot != startSlot && targetSlot.IsFull)
+                CargoLogisticsManager.Instance.RegisterRuleViolation();
+
             ReturnToStart();
             return;
         }

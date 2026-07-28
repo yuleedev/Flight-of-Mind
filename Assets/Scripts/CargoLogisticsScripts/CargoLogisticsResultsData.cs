@@ -9,21 +9,21 @@ public class TrialResult
     public int movesTaken;
     public int optimalMoves;
     public int excessMoves;
+    public int ruleViolations;
     public float errorIndex;
+    public float creditFraction;
+    public float itemDifficultyLogits;
     public float initialThinkingSeconds;
     public float subsequentThinkingSeconds;
     public float animationSeconds;
     public float totalSeconds;
     public float deliberationCostSeconds;
     public float expectedDeliberationSeconds;
+    public float paceRatio;
+    public float logPaceDeviation;
     public float planningRatio;
-    public float accuracyScore;
-    public float deliberationScore;
-    public float difficultyWeight;
     public int ageGroupIndex;
     public string ageGroupLabel;
-    public float referenceAccuracyScore;
-    public float referenceDeliberationScore;
 }
 
 public static class CargoLogisticsResults
@@ -37,9 +37,13 @@ public static class CargoLogisticsResults
     }
 
     public static void Record(int problemIndex, bool isPractice, int movesTaken, int optimalMoves,
-                              float initialThinking, float subsequentThinking,
+                              int ruleViolations, float initialThinking, float subsequentThinking,
                               float animationSeconds, float totalSeconds)
     {
+        float expected = CargoLogisticsScoring.ExpectedDeliberation(optimalMoves);
+        float cost = CargoLogisticsScoring.DeliberationCost(initialThinking, subsequentThinking);
+        float pace = CargoLogisticsScoring.PaceRatio(cost, expected);
+
         Trials.Add(new TrialResult
         {
             problemIndex = problemIndex,
@@ -47,23 +51,21 @@ public static class CargoLogisticsResults
             movesTaken = movesTaken,
             optimalMoves = optimalMoves,
             excessMoves = Mathf.Max(0, movesTaken - optimalMoves),
+            ruleViolations = ruleViolations,
             errorIndex = CargoLogisticsScoring.ErrorIndex(optimalMoves, movesTaken),
+            creditFraction = CargoLogisticsScoring.CreditFraction(optimalMoves, movesTaken, ruleViolations),
+            itemDifficultyLogits = CargoLogisticsScoring.ItemDifficulty(optimalMoves),
             initialThinkingSeconds = initialThinking,
             subsequentThinkingSeconds = subsequentThinking,
             animationSeconds = animationSeconds,
             totalSeconds = totalSeconds,
-            deliberationCostSeconds = CargoLogisticsScoring.DeliberationCost(initialThinking, subsequentThinking),
-            expectedDeliberationSeconds = CargoLogisticsScoring.ExpectedDeliberation(optimalMoves),
+            deliberationCostSeconds = cost,
+            expectedDeliberationSeconds = expected,
+            paceRatio = pace,
+            logPaceDeviation = Mathf.Log(pace),
             planningRatio = CargoLogisticsScoring.PlanningRatio(initialThinking, subsequentThinking),
-            accuracyScore = CargoLogisticsScoring.AccuracyScore(optimalMoves, movesTaken),
-            deliberationScore = CargoLogisticsScoring.DeliberationScore(initialThinking, subsequentThinking,
-                                                                        optimalMoves, movesTaken),
-            difficultyWeight = CargoLogisticsScoring.DifficultyWeight(optimalMoves),
             ageGroupIndex = CargoLogisticsNorms.CurrentGroupIndex,
-            ageGroupLabel = CargoLogisticsNorms.CurrentLabel,
-            referenceAccuracyScore = CargoLogisticsScoring.ReferenceAccuracyScore(optimalMoves, movesTaken),
-            referenceDeliberationScore = CargoLogisticsScoring.ReferenceDeliberationScore(
-                initialThinking, subsequentThinking, optimalMoves, movesTaken)
+            ageGroupLabel = CargoLogisticsNorms.CurrentLabel
         });
 
         CargoLogisticsScoring.LogTrial(Trials[Trials.Count - 1]);
@@ -72,23 +74,50 @@ public static class CargoLogisticsResults
 
 public static class CargoLogisticsScoring
 {
-    public const float InitialThinkingWeight = 1.00f;
-    public const float SubsequentThinkingWeight = 2.33f;
-    public const float PaceSensitivity = 1.1f;
+public static float InitialThinkingWeight = 1.00f;
+    public static float SubsequentThinkingWeight = 2.33f;
+    public static float PaceTolerance = 0.60f;
+    public static float ExpectedTimeMultiplier = 1.00f;
+    public const float ExcessMoveDecay = 1.60f;
+    public const float ViolationDecay = 0.25f;
+    public const float LogitsPerMove = 1.10f;
+    public const float AbilityPriorSd = 1.50f;
+    public const float ScorePerLogit = 20f;
+    public const float ScoreMidpoint = 50f;
     private const float MinCostSeconds = 0.25f;
 
-    public static int thinkingTimeScore;
+    public static void ConfigurePacing(float expectedTimeMultiplier, float paceTolerance,
+                                       float initialThinkingWeight, float subsequentThinkingWeight)
+    {
+        ExpectedTimeMultiplier = Mathf.Max(0.05f, expectedTimeMultiplier);
+        PaceTolerance = Mathf.Max(0.05f, paceTolerance);
+        InitialThinkingWeight = Mathf.Max(0f, initialThinkingWeight);
+        SubsequentThinkingWeight = Mathf.Max(0f, subsequentThinkingWeight);
+    }
+
     public static int logicalReasoningScore;
+    public static int thinkingTimeScore;
+    public static float rawReasoningScore;
+    public static float reasoningStandardError;
+    public static float abilityLogits;
+    public static float paceRmsDeviation;
+    public static float paceMeanLogDeviation;
+    public static bool AtCeiling;
+    public static bool AtFloor;
+    public static bool FinalScoresReady;
 
     public static void ResetFinalScores()
     {
-        thinkingTimeScore = 0;
         logicalReasoningScore = 0;
-    }
-
-    public static float DifficultyWeight(int optimalMoves)
-    {
-        return Mathf.Max(1, optimalMoves);
+        thinkingTimeScore = 0;
+        rawReasoningScore = 0f;
+        reasoningStandardError = 0f;
+        abilityLogits = 0f;
+        paceRmsDeviation = 0f;
+        paceMeanLogDeviation = 0f;
+        AtCeiling = false;
+        AtFloor = false;
+        FinalScoresReady = false;
     }
 
     public static float ErrorIndex(int optimalMoves, int movesTaken)
@@ -97,35 +126,24 @@ public static class CargoLogisticsScoring
         return Mathf.Max(0, movesTaken - optimalMoves) / (float)optimalMoves;
     }
 
-    public static float ExpectedDeliberation(int optimalMoves)
-    {
-        return ExpectedDeliberation(optimalMoves, CargoLogisticsNorms.Current);
-    }
-
-    public static float ReferenceExpectedDeliberation(int optimalMoves)
-    {
-        return ExpectedDeliberation(optimalMoves, CargoLogisticsNorms.Reference);
-    }
-
-    private static float ExpectedDeliberation(int optimalMoves, AgeNorm norm)
-    {
-        return norm.baseSeconds + norm.secondsPerMove * Mathf.Max(1, optimalMoves);
-    }
-
-    public static float AccuracyScore(int optimalMoves, int movesTaken)
-    {
-        return AccuracyScore(optimalMoves, movesTaken, CargoLogisticsNorms.Current);
-    }
-
-    public static float ReferenceAccuracyScore(int optimalMoves, int movesTaken)
-    {
-        return AccuracyScore(optimalMoves, movesTaken, CargoLogisticsNorms.Reference);
-    }
-
-    private static float AccuracyScore(int optimalMoves, int movesTaken, AgeNorm norm)
+    public static float CreditFraction(int optimalMoves, int movesTaken, int ruleViolations)
     {
         if (optimalMoves <= 0 || movesTaken <= 0) return 0f;
-        return 100f * Mathf.Exp(-norm.errorDecay * ErrorIndex(optimalMoves, movesTaken));
+
+        float penalty = ExcessMoveDecay * ErrorIndex(optimalMoves, movesTaken)
+                      + ViolationDecay * Mathf.Max(0, ruleViolations);
+        return Mathf.Clamp01(Mathf.Exp(-penalty));
+    }
+
+    public static float ItemDifficulty(int optimalMoves)
+    {
+        return LogitsPerMove * (Mathf.Max(1, optimalMoves) - CargoLogisticsNorms.Current.planningMidpoint);
+    }
+
+    public static float ExpectedDeliberation(int optimalMoves)
+    {
+        AgeNorm norm = CargoLogisticsNorms.Current;
+        return (norm.baseSeconds + norm.secondsPerMove * Mathf.Max(1, optimalMoves)) * ExpectedTimeMultiplier;
     }
 
     public static float DeliberationCost(float initialThinking, float subsequentThinking)
@@ -134,33 +152,33 @@ public static class CargoLogisticsScoring
              + SubsequentThinkingWeight * Mathf.Max(0f, subsequentThinking);
     }
 
+    public static float PaceRatio(float cost, float expected)
+    {
+        if (expected <= 0f) return 1f;
+        return Mathf.Max(cost, MinCostSeconds) / expected;
+    }
+
+    public static float PaceRatio(float initialThinking, float subsequentThinking, int optimalMoves)
+    {
+        return PaceRatio(DeliberationCost(initialThinking, subsequentThinking),
+                         ExpectedDeliberation(optimalMoves));
+    }
+
     public static float PlanningRatio(float initialThinking, float subsequentThinking)
     {
         float sum = Mathf.Max(0f, initialThinking) + Mathf.Max(0f, subsequentThinking);
         return sum <= 0f ? 0f : Mathf.Clamp01(initialThinking / sum);
     }
 
-    public static float DeliberationScore(float initialThinking, float subsequentThinking,
-                                          int optimalMoves, int movesTaken)
+    public static float PaceScoreFromDeviation(float logDeviation)
     {
-        return DeliberationScore(initialThinking, subsequentThinking, optimalMoves, movesTaken,
-                                 CargoLogisticsNorms.Current);
+        float squared = logDeviation * logDeviation;
+        return 100f * Mathf.Exp(-squared / (2f * PaceTolerance * PaceTolerance));
     }
 
-    public static float ReferenceDeliberationScore(float initialThinking, float subsequentThinking,
-                                                   int optimalMoves, int movesTaken)
+    private static float Logistic(float x)
     {
-        return DeliberationScore(initialThinking, subsequentThinking, optimalMoves, movesTaken,
-                                 CargoLogisticsNorms.Reference);
-    }
-
-    private static float DeliberationScore(float initialThinking, float subsequentThinking,
-                                           int optimalMoves, int movesTaken, AgeNorm norm)
-    {
-        float cost = Mathf.Max(DeliberationCost(initialThinking, subsequentThinking), MinCostSeconds);
-        float accuracyFraction = AccuracyScore(optimalMoves, movesTaken, norm) / 100f;
-        float rate = accuracyFraction * ExpectedDeliberation(optimalMoves, norm) / cost;
-        return 100f * (float)System.Math.Tanh(PaceSensitivity * rate);
+        return 1f / (1f + Mathf.Exp(-x));
     }
 
     public static int ScoredTrialCount()
@@ -171,42 +189,106 @@ public static class CargoLogisticsScoring
         return n;
     }
 
-    public static void ComputeFinalScores()
+    private static void EstimateAbility(out float theta, out float standardError)
     {
-        ComputeWeightedScores(out logicalReasoningScore, out thinkingTimeScore);
-        LogFinalResults();
+        float priorPrecision = 1f / (AbilityPriorSd * AbilityPriorSd);
+        theta = 0f;
+
+        if (ScoredTrialCount() == 0)
+        {
+            standardError = AbilityPriorSd;
+            return;
+        }
+
+        for (int iteration = 0; iteration < 40; iteration++)
+        {
+            float gradient = -theta * priorPrecision;
+            float information = priorPrecision;
+
+            foreach (var t in CargoLogisticsResults.Trials)
+            {
+                if (t.isPractice) continue;
+                float p = Logistic(theta - t.itemDifficultyLogits);
+                gradient += t.creditFraction - p;
+                information += p * (1f - p);
+            }
+
+            float step = gradient / information;
+            theta = Mathf.Clamp(theta + step, -6f, 6f);
+            if (Mathf.Abs(step) < 0.00001f) break;
+        }
+
+        float finalInformation = priorPrecision;
+        foreach (var t in CargoLogisticsResults.Trials)
+        {
+            if (t.isPractice) continue;
+            float p = Logistic(theta - t.itemDifficultyLogits);
+            finalInformation += p * (1f - p);
+        }
+
+        standardError = 1f / Mathf.Sqrt(finalInformation);
     }
 
-    private static void ComputeWeightedScores(out int reasoning, out int thinking)
+    private static float EstimatePaceScore(out float rmsDeviation, out float meanDeviation)
     {
         float weightSum = 0f;
-        float accuracySum = 0f;
-        float deliberationSum = 0f;
+        float squaredSum = 0f;
+        float linearSum = 0f;
 
         foreach (var t in CargoLogisticsResults.Trials)
         {
             if (t.isPractice) continue;
-            weightSum += t.difficultyWeight;
-            accuracySum += t.accuracyScore * t.difficultyWeight;
-            deliberationSum += t.deliberationScore * t.difficultyWeight;
+            float w = Mathf.Max(0.01f, t.expectedDeliberationSeconds);
+            weightSum += w;
+            squaredSum += w * t.logPaceDeviation * t.logPaceDeviation;
+            linearSum += w * t.logPaceDeviation;
         }
 
-        reasoning = weightSum > 0f ? Mathf.RoundToInt(accuracySum / weightSum) : 0;
-        thinking = weightSum > 0f ? Mathf.RoundToInt(deliberationSum / weightSum) : 0;
+        if (weightSum <= 0f)
+        {
+            rmsDeviation = 0f;
+            meanDeviation = 0f;
+            return 0f;
+        }
+
+        float meanSquare = squaredSum / weightSum;
+        rmsDeviation = Mathf.Sqrt(meanSquare);
+        meanDeviation = linearSum / weightSum;
+        return 100f * Mathf.Exp(-meanSquare / (2f * PaceTolerance * PaceTolerance));
+    }
+
+    public static void ComputeFinalScores()
+    {
+        EstimateAbility(out abilityLogits, out float standardErrorLogits);
+
+        rawReasoningScore = ScoreMidpoint + ScorePerLogit * abilityLogits;
+        logicalReasoningScore = Mathf.Clamp(Mathf.RoundToInt(rawReasoningScore), 0, 100);
+        reasoningStandardError = ScorePerLogit * standardErrorLogits;
+
+        thinkingTimeScore = Mathf.Clamp(
+            Mathf.RoundToInt(EstimatePaceScore(out paceRmsDeviation, out paceMeanLogDeviation)), 0, 100);
+
+        AtCeiling = rawReasoningScore >= 99.5f;
+        AtFloor = rawReasoningScore <= 0.5f;
+        FinalScoresReady = ScoredTrialCount() > 0;
+
+        LogFinalResults();
+        
     }
 
     public static void LogMove(int problemIndex, bool isPractice, int movesSoFar, int optimalMoves,
-                               float initialThinking, float subsequentThinking)
+                               int ruleViolations, float initialThinking, float subsequentThinking)
     {
-        float thinking = DeliberationScore(initialThinking, subsequentThinking, optimalMoves, movesSoFar);
-        float accuracy = AccuracyScore(optimalMoves, movesSoFar);
         float cost = DeliberationCost(initialThinking, subsequentThinking);
+        float expected = ExpectedDeliberation(optimalMoves);
+        float pace = PaceRatio(cost, expected);
+        float credit = CreditFraction(optimalMoves, movesSoFar, ruleViolations);
 
         Debug.Log(
             $"[{(isPractice ? "practice" : "scored")}] problem {problemIndex} move {movesSoFar}/{optimalMoves} -> " +
-            $"thinkingTimeScore {thinking:F1}/100 | accuracy {accuracy:F1}/100 | " +
-            $"initial {initialThinking:F2}s, subsequent {subsequentThinking:F2}s, " +
-            $"cost {cost:F2}s vs expected {ExpectedDeliberation(optimalMoves):F2}s | " +
+            $"credit {credit:F3} | violations {ruleViolations} | " +
+            $"cost {cost:F2}s vs expected {expected:F2}s (pace {pace:F2}x, " +
+            $"pace score {PaceScoreFromDeviation(Mathf.Log(pace)):F0}/100) | " +
             $"age band {CargoLogisticsNorms.CurrentLabel}");
     }
 
@@ -220,9 +302,15 @@ public static class CargoLogisticsScoring
 
         if (!t.isPractice)
         {
-            ComputeWeightedScores(out int reasoning, out int thinking);
+            EstimateAbility(out float theta, out float se);
+            float raw = ScoreMidpoint + ScorePerLogit * theta;
+            int running = Mathf.Clamp(Mathf.RoundToInt(raw), 0, 100);
+            float runningPace = EstimatePaceScore(out float rms, out float meanDev);
+
             sb.AppendLine($"    running after {ScoredTrialCount()} scored trial(s): " +
-                          $"logicalReasoningScore = {reasoning} / 100 | thinkingTimeScore = {thinking} / 100");
+                          $"logical reasoning {running}/100 (uncapped {raw:F0}, +/- {ScorePerLogit * se:F0}) | " +
+                          $"thinking time {runningPace:F0}/100 (typical pace {Mathf.Exp(meanDev):F2}x, " +
+                          $"spread {Mathf.Exp(rms):F2}x)");
         }
 
         Debug.Log(sb.ToString());
@@ -233,39 +321,55 @@ public static class CargoLogisticsScoring
         var sb = new System.Text.StringBuilder();
 
         sb.AppendLine(
-            $"    moves {t.movesTaken}/{t.optimalMoves} (excess {t.excessMoves}, error index {t.errorIndex:F2}) " +
-            $"-> accuracy {t.accuracyScore:F1}/100");
+            $"    moves {t.movesTaken}/{t.optimalMoves} (excess {t.excessMoves}, error index {t.errorIndex:F2}) | " +
+            $"violations {t.ruleViolations} -> credit {t.creditFraction:F3} " +
+            $"(item difficulty {t.itemDifficultyLogits:F2} logits)");
         sb.AppendLine(
             $"    initial {t.initialThinkingSeconds:F2}s | subsequent {t.subsequentThinkingSeconds:F2}s | " +
-            $"animation {t.animationSeconds:F2}s | total {t.totalSeconds:F2}s");
+            $"animation {t.animationSeconds:F2}s | total {t.totalSeconds:F2}s | " +
+            $"planning ratio {t.planningRatio:F2}");
         sb.AppendLine(
-            $"    planning ratio {t.planningRatio:F2} | weighted cost {t.deliberationCostSeconds:F2}s " +
-            $"vs expected {t.expectedDeliberationSeconds:F2}s -> deliberation {t.deliberationScore:F1}/100 " +
-            $"(weight {t.difficultyWeight:F0})");
-        sb.AppendLine(
-            $"    age band {t.ageGroupLabel} | reference-band accuracy {t.referenceAccuracyScore:F1} | " +
-            $"reference-band deliberation {t.referenceDeliberationScore:F1}");
+            $"    weighted cost {t.deliberationCostSeconds:F2}s vs expected {t.expectedDeliberationSeconds:F2}s " +
+            $"-> pace {t.paceRatio:F2}x (log dev {t.logPaceDeviation:F2}) | age band {t.ageGroupLabel}");
 
         return sb.ToString();
     }
 
     private static void LogFinalResults()
     {
-        var sb = new System.Text.StringBuilder();
+        var raw = new System.Text.StringBuilder();
 
-        sb.AppendLine("===== CARGO LOGISTICS - PER-TRIAL RAW DATA =====");
+        raw.AppendLine("===== CARGO LOGISTICS - PER-TRIAL RAW DATA =====");
         foreach (var t in CargoLogisticsResults.Trials)
         {
-            sb.AppendLine($"[{(t.isPractice ? "practice" : "scored")}] problem {t.problemIndex}:");
-            sb.Append(FormatTrial(t));
+            raw.AppendLine($"[{(t.isPractice ? "practice" : "scored")}] problem {t.problemIndex}:");
+            raw.Append(FormatTrial(t));
         }
 
-        sb.AppendLine("===== CARGO LOGISTICS - FINAL SCORES (practice trial excluded) =====");
-        sb.AppendLine($"Age band: {CargoLogisticsNorms.CurrentLabel}");
-        sb.AppendLine($"Scored trials: {ScoredTrialCount()}");
-        sb.AppendLine($"logicalReasoningScore = {logicalReasoningScore} / 100");
-        sb.AppendLine($"thinkingTimeScore     = {thinkingTimeScore} / 100");
+        Debug.Log(raw.ToString());
 
-        Debug.Log(sb.ToString());
+        var final = new System.Text.StringBuilder();
+
+        final.AppendLine($"CARGO LOGISTICS FINAL - logical reasoning {logicalReasoningScore}/100 | " +
+                         $"thinking time {thinkingTimeScore}/100");
+        final.AppendLine($"  logical reasoning {logicalReasoningScore}/100 - 50/100 is average for the age band, " +
+                         $"plausible range {Mathf.Max(0f, rawReasoningScore - reasoningStandardError):F0}-" +
+                         $"{Mathf.Min(100f, rawReasoningScore + reasoningStandardError):F0}");
+        final.AppendLine($"  thinking time {thinkingTimeScore}/100 - 100/100 means paced as expected, " +
+                         $"score falls if much faster OR much slower");
+        final.AppendLine($"  typical pace was {Mathf.Exp(paceMeanLogDeviation):F2}x the expected time " +
+                         $"(consistency spread {Mathf.Exp(paceRmsDeviation):F2}x)");
+        final.AppendLine($"  age band {CargoLogisticsNorms.CurrentLabel} | scored trials {ScoredTrialCount()} " +
+                         $"(practice excluded) | ability {abilityLogits:F2} logits");
+
+        if (AtCeiling)
+            final.AppendLine($"  CEILING: uncapped estimate was {rawReasoningScore:F0} - the score is a lower " +
+                             $"bound, not a point estimate. These items are too easy to measure this player.");
+        if (AtFloor)
+            final.AppendLine($"  FLOOR: uncapped estimate was {rawReasoningScore:F0} - the score is an upper " +
+                             $"bound. These items are too hard to measure this player.");
+
+        Debug.Log(final.ToString());
+        Debug.Log($"Thinking Time: {thinkingTimeScore}/100\nLogical Reasoning: {logicalReasoningScore}/100");
     }
 }
