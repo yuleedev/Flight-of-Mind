@@ -509,9 +509,7 @@ public class RadarPivot : MonoBehaviour
         for (int number = countdownSeconds; number >= 1; number--)
         {
             SetInstructionText(
-                "Ready? The real game will start in " +
-                countdownSeconds +
-                " seconds.\n" +
+                "The real game will start in:\n" +
                 number
             );
 
