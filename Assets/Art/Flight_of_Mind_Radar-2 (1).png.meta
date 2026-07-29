@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 083246bf6a17d427a8955bd8454d7546
+guid: 3c7719b8b9a40224caed88d8e734690a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1824707303822807211
-    second: White_Icon_CB_0
+      213: -2513991330296893639
+    second: Flight_of_Mind_Radar-2 (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: White_Icon_CB_0
+      name: Flight_of_Mind_Radar-2 (1)_0
       rect:
         serializedVersion: 2
-        x: 208
-        y: 519
-        width: 72
-        height: 74
+        x: 0
+        y: 0
+        width: 1144
+        height: 1080
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ba05b6700a9a25910800000000000000
-      internalID: 1824707303822807211
+      spriteID: 93fed3d64328c1dd0800000000000000
+      internalID: -2513991330296893639
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      White_Icon_CB_0: 1824707303822807211
+      Flight_of_Mind_Radar-2 (1)_0: -2513991330296893639
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
