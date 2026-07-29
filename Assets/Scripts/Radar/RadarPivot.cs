@@ -644,7 +644,7 @@ public class RadarPivot : MonoBehaviour
 
     public void OnContinueToResultsClicked()
     {
-        SceneManager.LoadScene("Results");
+        SceneManager.LoadScene("ResultsScreen");
     }
 
     private int CalculateFinalScore()
