@@ -11,6 +11,7 @@ public class CargoLogisticsManager : MonoBehaviour
 
     [SerializeField] private StackSlot[] slots;
     [SerializeField] private MoveCount moveCounter;
+    [SerializeField] private TMPro.TextMeshProUGUI progressText;
 
     [FormerlySerializedAs("redCargo")]
     [SerializeField] private GameObject orangeCargo;
@@ -42,6 +43,7 @@ public class CargoLogisticsManager : MonoBehaviour
     [SerializeField, Range(0f, 3f)] private float initialThinkingWeight = 1.00f;
     [Tooltip("Cost multiplier on hesitation between moves.")]
     [SerializeField, Range(0f, 3f)] private float subsequentThinkingWeight = 2.33f;
+
     private Canvas canvas;
     private int moveCount = 0;
     private int ruleViolations = 0;
@@ -86,6 +88,7 @@ void Awake()
     {
         currentProblemIndex = index;
         problemSolved = false;
+        UpdateProgressDisplay();
 
         TowerOfLondonProblem problem = ProblemLibrary.Sequence[index];
         goalState = problem.goal;
@@ -233,5 +236,11 @@ void Awake()
     void OnValidate()
     {
         ApplyPacingSettings();
+    }
+
+    private void UpdateProgressDisplay()
+    {
+        if (progressText != null)
+            progressText.text = $"{currentProblemIndex + 1}/{ProblemLibrary.Sequence.Count}";
     }
 }
