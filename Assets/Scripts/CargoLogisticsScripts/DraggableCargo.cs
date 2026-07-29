@@ -58,7 +58,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 0f; // 2D UI sound, not positioned in world space
+        audioSource.spatialBlend = 0f;
 
         NormalizeAnchors();
         StripPhysicsComponents();
@@ -94,7 +94,11 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         startSlot = GetComponentInParent<StackSlot>();
         isValidDrag = startSlot != null && startSlot.Top == transform;
 
-        if (!isValidDrag) return;
+        if (!isValidDrag)
+        {
+            if (startSlot != null) CargoLogisticsManager.Instance.RegisterRuleViolation();
+            return;
+        }
 
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(canvas.transform, true);
@@ -141,6 +145,9 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         if (!isValidDrop)
         {
+            if (targetSlot != null && targetSlot != startSlot && targetSlot.IsFull)
+                CargoLogisticsManager.Instance.RegisterRuleViolation();
+
             ReturnToStart();
             return;
         }
@@ -171,10 +178,12 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         StartCoroutine(FallToPosition(targetY, () => startSlot.RestackItems()));
     }
+
     private IEnumerator FallToPosition(float targetY, Action onLanded)
     {
         isFalling = true;
         if (thinkingTime.Instance != null) thinkingTime.Instance.OnAnimationStarted();
+
         PlaySound(fallSound, fallSoundVolume);
 
         float y = rectTransform.anchoredPosition.y;
@@ -189,7 +198,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             if (y <= targetY)
             {
                 y = targetY;
-                float impactSpeed = -velocityY; 
+                float impactSpeed = -velocityY;
 
                 bool canStillBounce = bounceCount < maxBounces && impactSpeed * bounciness > minBounceSpeed;
 
@@ -213,7 +222,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
 
         isFalling = false;
-         if (thinkingTime.Instance != null) thinkingTime.Instance.OnAnimationEnded();
+        if (thinkingTime.Instance != null) thinkingTime.Instance.OnAnimationEnded();
         onLanded?.Invoke();
     }
 

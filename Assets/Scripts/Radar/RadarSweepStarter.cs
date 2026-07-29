@@ -6,8 +6,6 @@ public class RadarSweepStarter : MonoBehaviour
 
     private void OnDisable()
     {
-
-
         if (sweepSource != null && !sweepSource.isPlaying)
         {
             sweepSource.Play();
