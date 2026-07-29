@@ -1593,7 +1593,11 @@ MonoBehaviour:
   - {fileID: 280908074}
   - {fileID: 695764296}
   startPanel: {fileID: 1307316701}
-  participantAge: 67
+  participantAge: 16
+  expectedTimeMultiplier: 1
+  paceTolerance: 0.6
+  initialThinkingWeight: 1
+  subsequentThinkingWeight: 2.33
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0

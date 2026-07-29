@@ -391,6 +391,12 @@ public class RadarPivot : MonoBehaviour
                     "TUTORIAL: Correct\nYou pressed SPACE."
                 );
             }
+
+            SetWarningVisible(false);
+
+            tutorialSweepIndex++;
+            waitingForNextRotation = true;
+            transitionTimer = tutorialFeedbackDuration;
         }
         else
         {
@@ -405,22 +411,28 @@ public class RadarPivot : MonoBehaviour
             if (warningActive)
             {
                 SetInstructionText(
-                    "TUTORIAL: Incorrect\nDo not press SPACE when there is a warning."
+                    "TUTORIAL: Incorrect\nDo not press SPACE when there is a warning.\nRestarting practice..."
                 );
             }
             else
             {
                 SetInstructionText(
-                    "TUTORIAL: Missed\nPress SPACE when there is no warning."
+                    "TUTORIAL: Missed\nPress SPACE when there is no warning.\nRestarting practice..."
                 );
             }
+
+            SetWarningVisible(false);
+
+            tutorialSweepIndex = 0;
+
+            if (passFailCounter != null)
+            {
+                passFailCounter.ResetCounter();
+            }
+
+            waitingForNextRotation = true;
+            transitionTimer = tutorialFeedbackDuration;
         }
-
-        SetWarningVisible(false);
-
-        tutorialSweepIndex++;
-        waitingForNextRotation = true;
-        transitionTimer = tutorialFeedbackDuration;
     }
 
     private void StartNewRotation()

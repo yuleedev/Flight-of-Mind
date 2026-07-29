@@ -1075,7 +1075,7 @@ MonoBehaviour:
   tutorialRotationSpeed: 100
   levelDuration: 150
   tutorialSweeps: 2
-  tutorialFeedbackDuration: 1.5
+  tutorialFeedbackDuration: 3
   scoredStartMessageDuration: 2
   countdownSeconds: 3
   instructionsPanel: {fileID: 804984198}
