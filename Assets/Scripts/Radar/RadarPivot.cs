@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RadarPivot : MonoBehaviour
@@ -36,14 +37,14 @@ public class RadarPivot : MonoBehaviour
 
     [Header("Scoring")]
     [SerializeField, Range(0f, 1f)] private float accuracyWeight = 0.60f;
-    [SerializeField, Range(0f, 1f)] private float falsePositiveWeight = 0.15f;
-    [SerializeField, Range(0f, 1f)] private float falseNegativeWeight = 0.15f;
+    [SerializeField, Range(0f, 1f)] private float falsePositiveWeight = 0.8f;
+    [SerializeField, Range(0f, 1f)] private float falseNegativeWeight = 0.5f;
     [SerializeField, Range(0f, 1f)] private float reactionTimeWeight = 0.10f;
     [SerializeField] private float excellentReactionTime = 0.35f;
     [SerializeField] private float poorReactionTime = 1.50f;
 
     public int FinalScore { get; private set; }
-    public string FinalRank { get; private set; } = "F";
+    public int ReactionTimeScore { get; private set; }
 
     private float degreesRotated;
     private float flashTimer;
@@ -77,7 +78,7 @@ public class RadarPivot : MonoBehaviour
         temporaryMessageTimer = 0f;
         tutorialSweepIndex = 0;
         FinalScore = 0;
-        FinalRank = "F";
+        ReactionTimeScore = 0;
 
         gameStarted = false;
         gameFinished = false;
@@ -131,7 +132,7 @@ public class RadarPivot : MonoBehaviour
         temporaryMessageTimer = 0f;
         tutorialSweepIndex = 0;
         FinalScore = 0;
-        FinalRank = "F";
+        ReactionTimeScore = 0;
 
         pressedThisRotation = false;
         warningActive = false;
@@ -143,6 +144,8 @@ public class RadarPivot : MonoBehaviour
         {
             passFailCounter.ResetCounter();
         }
+
+        RadarWatchResults.Clear();
 
         if (instructionsPanel != null)
         {
@@ -328,6 +331,7 @@ public class RadarPivot : MonoBehaviour
 
         if (pressedThisRotation)
         {
+            LogReactionTimeScore();
             StartNewRotation();
             return;
         }
@@ -358,8 +362,18 @@ public class RadarPivot : MonoBehaviour
 
         SetWarningVisible(false);
 
+        LogReactionTimeScore();
+
         waitingForNextRotation = true;
         transitionTimer = flashDuration;
+    }
+
+    private void LogReactionTimeScore()
+    {
+        ReactionTimeScore = Mathf.RoundToInt(CalculateReactionTimeScore());
+        RadarWatchResults.SetReactionTimeScore(ReactionTimeScore);
+
+        Debug.Log("Radar Watch reaction time score: " + ReactionTimeScore + "/100");
     }
 
     private void FinishTutorialRotation()
@@ -600,14 +614,22 @@ public class RadarPivot : MonoBehaviour
                 : "--";
 
         FinalScore = CalculateFinalScore();
-        FinalRank = GetRank(FinalScore);
+
+        RadarWatchResults.Record(
+            FinalScore,
+            passFailCounter.Passes,
+            passFailCounter.Fails,
+            passFailCounter.FalsePositives,
+            passFailCounter.FalseNegatives,
+            passFailCounter.HasReactionTime,
+            passFailCounter.AverageReactionTime
+        );
 
         completionText.text =
             "Radar Watch Complete\n\n" +
             "Score: " +
             FinalScore +
-            "/100\nRank: " +
-            FinalRank +
+            "/100" +
             "\n\nPasses: " +
             passFailCounter.Passes +
             "\nFails: " +
@@ -618,6 +640,11 @@ public class RadarPivot : MonoBehaviour
             passFailCounter.FalseNegatives +
             "\nAverage Reaction: " +
             averageReaction;
+    }
+
+    public void OnContinueToResultsClicked()
+    {
+        SceneManager.LoadScene("Results");
     }
 
     private int CalculateFinalScore()
@@ -650,23 +677,7 @@ public class RadarPivot : MonoBehaviour
             ((float)passFailCounter.FalseNegatives /
             totalRounds * 100f);
 
-        float reactionScore = 0f;
-
-        if (passFailCounter.HasReactionTime)
-        {
-            float reactionRange =
-                Mathf.Max(
-                    0.01f,
-                    poorReactionTime - excellentReactionTime
-                );
-
-            reactionScore =
-                Mathf.Clamp01(
-                    (poorReactionTime -
-                    passFailCounter.AverageReactionTime) /
-                    reactionRange
-                ) * 100f;
-        }
+        float reactionScore = CalculateReactionTimeScore();
 
         float totalWeight =
             accuracyWeight +
@@ -691,34 +702,24 @@ public class RadarPivot : MonoBehaviour
         );
     }
 
-    private string GetRank(int score)
+    private float CalculateReactionTimeScore()
     {
-        if (score >= 95)
+        if (passFailCounter == null || !passFailCounter.HasReactionTime)
         {
-            return "S";
+            return 0f;
         }
 
-        if (score >= 85)
-        {
-            return "A";
-        }
+        float reactionRange =
+            Mathf.Max(
+                0.01f,
+                poorReactionTime - excellentReactionTime
+            );
 
-        if (score >= 75)
-        {
-            return "B";
-        }
-
-        if (score >= 65)
-        {
-            return "C";
-        }
-
-        if (score >= 55)
-        {
-            return "D";
-        }
-
-        return "F";
+        return Mathf.Clamp01(
+            (poorReactionTime -
+            passFailCounter.AverageReactionTime) /
+            reactionRange
+        ) * 100f;
     }
 
     private void UpdateTemporaryMessage()
