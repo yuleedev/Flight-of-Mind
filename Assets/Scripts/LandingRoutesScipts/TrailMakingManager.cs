@@ -47,6 +47,9 @@ public class TrailMakingManager : MonoBehaviour
     {
         Instance = this;
         TrailMakingResults.Clear();
+
+        if (routeA != null && routeA.Length > 1)
+            TrailMakingScoring.TargetsPerRoute = routeA.Length;
     }
 
     void Update()
@@ -272,6 +275,7 @@ public class TrailMakingManager : MonoBehaviour
     		errorsB = errors;
     		TrailMakingResults.Record("B", timeB, errorsB);
     		TrailMakingResults.LogResults();
+    		TrailMakingScoring.LogScores();
     		ShowResults();
     		Invoke(nameof(GoToCargo), nextSceneDelay);
 		}
