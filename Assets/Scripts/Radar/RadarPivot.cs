@@ -22,7 +22,9 @@ public class RadarPivot : MonoBehaviour
     [SerializeField] private TMP_Text timerText;
 
     [SerializeField] private GameObject completionPanel;
-    [SerializeField] private TMP_Text completionText;
+
+    [SerializeField] private string resultsSceneName = "ResultsScreen";
+    [SerializeField] private float resultsTransitionDelay = 0.75f;
 
     [SerializeField] private Image greenFlash;
     [SerializeField] private float flashDuration = 0.2f;
@@ -454,6 +456,8 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         rotationStartTime = Time.time;
 
+        UpdateTimerDisplay();
+
         if (warningTriangle != null)
         {
             warningTriangle.color = warningStartColor;
@@ -531,6 +535,7 @@ public class RadarPivot : MonoBehaviour
         SetWarningVisible(false);
         HideFlash();
         SetPhaseText("GET READY");
+        UpdateTimerDisplay();
 
         for (int number = countdownSeconds; number >= 1; number--)
         {
@@ -590,61 +595,35 @@ public class RadarPivot : MonoBehaviour
 
         if (completionPanel != null)
         {
-            completionPanel.SetActive(true);
+            completionPanel.SetActive(false);
         }
 
-        if (completionText == null)
+        if (passFailCounter != null)
         {
-            return;
+            FinalScore = CalculateFinalScore();
+
+            RadarWatchResults.Record(
+                FinalScore,
+                passFailCounter.Passes,
+                passFailCounter.Fails,
+                passFailCounter.FalsePositives,
+                passFailCounter.FalseNegatives,
+                passFailCounter.HasReactionTime,
+                passFailCounter.AverageReactionTime
+            );
         }
 
-        if (passFailCounter == null)
-        {
-            completionText.text =
-                "Radar Watch Complete";
-
-            return;
-        }
-
-        string averageReaction =
-            passFailCounter.HasReactionTime
-                ? passFailCounter
-                    .AverageReactionTime
-                    .ToString("F3") + " s"
-                : "--";
-
-        FinalScore = CalculateFinalScore();
-
-        RadarWatchResults.Record(
-            FinalScore,
-            passFailCounter.Passes,
-            passFailCounter.Fails,
-            passFailCounter.FalsePositives,
-            passFailCounter.FalseNegatives,
-            passFailCounter.HasReactionTime,
-            passFailCounter.AverageReactionTime
-        );
-
-        completionText.text =
-            "Radar Watch Complete\n\n" +
-            "Score: " +
-            FinalScore +
-            "/100" +
-            "\n\nPasses: " +
-            passFailCounter.Passes +
-            "\nFails: " +
-            passFailCounter.Fails +
-            "\nFalse Positives: " +
-            passFailCounter.FalsePositives +
-            "\nFalse Negatives: " +
-            passFailCounter.FalseNegatives +
-            "\nAverage Reaction: " +
-            averageReaction;
+        StartCoroutine(LoadResultsScreen());
     }
 
-    public void OnContinueToResultsClicked()
+    private IEnumerator LoadResultsScreen()
     {
-        SceneManager.LoadScene("ResultsScreen");
+        if (resultsTransitionDelay > 0f)
+        {
+            yield return new WaitForSeconds(resultsTransitionDelay);
+        }
+
+        SceneManager.LoadScene(resultsSceneName);
     }
 
     private int CalculateFinalScore()
@@ -781,6 +760,23 @@ public class RadarPivot : MonoBehaviour
             return;
         }
 
+        if (tutorialActive)
+        {
+            int currentSweep =
+                Mathf.Min(
+                    tutorialSweepIndex + 1,
+                    tutorialSweeps
+                );
+
+            timerText.text =
+                "PRACTICE SWEEP " +
+                currentSweep +
+                " / " +
+                tutorialSweeps;
+
+            return;
+        }
+
         float remainingTime =
             Mathf.Max(
                 0f,
@@ -796,10 +792,38 @@ public class RadarPivot : MonoBehaviour
         int seconds =
             totalSeconds % 60;
 
-        timerText.text =
+        string display =
+            "TIME LEFT " +
             minutes +
             ":" +
             seconds.ToString("00");
+
+        int sweepsLeft =
+            SweepsRemaining(remainingTime);
+
+        if (sweepsLeft > 0)
+        {
+            display +=
+                "     SWEEPS LEFT ~" +
+                sweepsLeft;
+        }
+
+        timerText.text = display;
+    }
+
+    private int SweepsRemaining(float remainingTime)
+    {
+        if (rotationSpeed <= 0f)
+        {
+            return 0;
+        }
+
+        float secondsPerSweep =
+            360f / rotationSpeed;
+
+        return Mathf.CeilToInt(
+            remainingTime / secondsPerSweep
+        );
     }
 
     private void UpdateFlash()
