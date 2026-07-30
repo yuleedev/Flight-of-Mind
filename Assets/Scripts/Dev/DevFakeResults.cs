@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public static class DevFakeResults
 {
@@ -55,7 +54,7 @@ public static class DevFakeResults
     public static void OpenResultsScreen()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(ResultsSceneName);
+        SceneTransition.LoadScene(ResultsSceneName);
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

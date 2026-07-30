@@ -1,7 +1,6 @@
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ResultsScreenUI : MonoBehaviour
@@ -291,6 +290,6 @@ public class ResultsScreenUI : MonoBehaviour
 
     public void OnContinueClicked()
     {
-        SceneManager.LoadScene(continueScene);
+        SceneTransition.LoadScene(continueScene);
     }
 }

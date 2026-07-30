@@ -2,7 +2,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RadarPivot : MonoBehaviour
@@ -623,7 +622,7 @@ public class RadarPivot : MonoBehaviour
             yield return new WaitForSeconds(resultsTransitionDelay);
         }
 
-        SceneManager.LoadScene(resultsSceneName);
+        SceneTransition.LoadScene(resultsSceneName);
     }
 
     private int CalculateFinalScore()

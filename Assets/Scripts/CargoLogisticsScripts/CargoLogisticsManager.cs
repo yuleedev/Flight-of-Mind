@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -220,7 +219,7 @@ void Awake()
         if (isLastProblem)
         {
             sessionComplete = true;
-            SceneManager.LoadScene("Radar");
+            SceneTransition.LoadScene("Radar");
         }
         else
         {

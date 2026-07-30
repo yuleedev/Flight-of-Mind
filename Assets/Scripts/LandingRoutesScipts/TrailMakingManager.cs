@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class TrailMakingManager : MonoBehaviour
 {
@@ -336,6 +335,6 @@ public class TrailMakingManager : MonoBehaviour
 
 	void GoToCargo()
 	{
-    	SceneManager.LoadScene("cargoGame");
+    	SceneTransition.LoadScene("cargoGame");
 	}
 }

@@ -31,6 +31,14 @@ public class ScoreDial : MonoBehaviour
 
     private Coroutine sweep;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void Prewarm()
+    {
+        RingSprite();
+        DiscSprite();
+        CardSprite();
+    }
+
     public static ScoreDial Create(RectTransform parent, TMP_FontAsset font)
     {
         GameObject root = NewUIObject("ScoreDial", parent);
@@ -132,6 +140,9 @@ public class ScoreDial : MonoBehaviour
 
     private IEnumerator Sweep(int score, float target)
     {
+        while (SceneTransition.IsBusy)
+            yield return null;
+
         float elapsed = 0f;
 
         while (elapsed < SweepSeconds)
