@@ -11,9 +11,15 @@ public class ResultDisplay
         BuildPanel(canvas, message, 80f, 32f);
     }
 
+    public static void Show(Canvas canvas, string message, float height, float fontSize)
+    {
+        BuildPanel(canvas, message, height, fontSize);
+    }
+
     private static void BuildPanel(Canvas canvas, string message, float height, float fontSize)
     {
         if (activePanel != null) Object.Destroy(activePanel);
+        if (canvas == null) return;
 
         GameObject panel = new GameObject("ResultPanel", typeof(RectTransform));
         RectTransform rt = panel.GetComponent<RectTransform>();

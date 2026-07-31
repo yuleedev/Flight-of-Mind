@@ -43,6 +43,14 @@ public class CargoLogisticsManager : MonoBehaviour
     [Tooltip("Cost multiplier on hesitation between moves.")]
     [SerializeField, Range(0f, 3f)] private float subsequentThinkingWeight = 2.33f;
 
+    [Header("Result Panel Timing")]
+    [Tooltip("How long the result panel stays up between problems.")]
+    [SerializeField] private float resultSeconds = 2f;
+    [Tooltip("How long the final result panel stays up before the Radar scene loads. Raise this if the last problem's result flashes past.")]
+    [SerializeField] private float finalResultSeconds = 4f;
+    [Tooltip("Height in canvas pixels of the final panel, which carries an extra line of text.")]
+    [SerializeField] private float finalPanelHeight = 130f;
+
     private Canvas canvas;
     private int moveCount = 0;
     private int ruleViolations = 0;
@@ -193,21 +201,28 @@ void Awake()
         CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves,
                                      ruleViolations, initial, subsequent, animation, total);
 
+        Time.timeScale = 0f;
+
+        if (isLastProblem)
+        {
+            CargoLogisticsScoring.ComputeFinalScores();
+
+            ResultDisplay.Show(canvas,
+                $"Solved in {moveCount} moves (optimal was {currentOptimalMoves}).\nAll problems complete!",
+                finalPanelHeight, 32f);
+
+            StartCoroutine(AdvanceAfterDelay(finalResultSeconds, true));
+            return;
+        }
+
         string message;
         if (problem.isPractice)
             message = "Practice complete! Starting the timed problems...";
-        else if (isLastProblem)
-            message = "All problems complete!";
         else
             message = $"Solved in {moveCount} moves (optimal was {currentOptimalMoves}).";
 
         ResultDisplay.Show(canvas, message);
-        Time.timeScale = 0f;
-
-        if (isLastProblem)
-            CargoLogisticsScoring.ComputeFinalScores();
-
-        StartCoroutine(AdvanceAfterDelay(2f, isLastProblem));
+        StartCoroutine(AdvanceAfterDelay(resultSeconds, false));
     }
 
     private IEnumerator AdvanceAfterDelay(float seconds, bool isLastProblem)
