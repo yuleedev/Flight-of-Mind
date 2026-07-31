@@ -15,6 +15,10 @@ public class RadarPivot : MonoBehaviour
     [SerializeField] private int countdownSeconds = 3;
 
     [SerializeField] private GameObject instructionsPanel;
+    [Tooltip("The readout block on the blue panel. Hidden until the run starts.")]
+    [SerializeField] private GameObject panelHud;
+    [Tooltip("Backing plate behind the instruction line at the top of the screen.")]
+    [SerializeField] private GameObject tutorialBanner;
 
     [SerializeField] private TMP_Text phaseText;
     [SerializeField] private TMP_Text tutorialInstructionText;
@@ -99,7 +103,8 @@ public class RadarPivot : MonoBehaviour
         SetWarningVisible(false);
         SetPhaseText("READY");
         HideInstructionText();
-        UpdateTimerDisplay();
+        SetTimerVisible(false);
+        SetPanelHudVisible(false);
 
         if (instructionsPanel != null)
         {
@@ -158,6 +163,8 @@ public class RadarPivot : MonoBehaviour
             completionPanel.SetActive(false);
         }
 
+        SetPanelHudVisible(true);
+        SetTimerVisible(true);
         UpdateTimerDisplay();
 
         if (tutorialActive)
@@ -309,7 +316,7 @@ public class RadarPivot : MonoBehaviour
             FlashScreen(Color.red);
 
             SetInstructionText(
-                "TUTORIAL: Incorrect\nDo not press SPACE when there is a warning."
+                "<b>Not that one.</b> A warning was showing, so hold off."
             );
         }
         else
@@ -317,7 +324,7 @@ public class RadarPivot : MonoBehaviour
             FlashScreen(Color.green);
 
             SetInstructionText(
-                "TUTORIAL: Correct\nYou pressed SPACE with no warning."
+                "<b>Correct.</b> Clear sweep, pressed in time."
             );
         }
     }
@@ -397,13 +404,13 @@ public class RadarPivot : MonoBehaviour
             if (warningActive)
             {
                 SetInstructionText(
-                    "TUTORIAL: Correct\nYou did not press SPACE."
+                    "<b>Correct.</b> Warning showing, so you held off."
                 );
             }
             else
             {
                 SetInstructionText(
-                    "TUTORIAL: Correct\nYou pressed SPACE."
+                    "<b>Correct.</b> Clear sweep, pressed in time."
                 );
             }
 
@@ -426,13 +433,13 @@ public class RadarPivot : MonoBehaviour
             if (warningActive)
             {
                 SetInstructionText(
-                    "TUTORIAL: Incorrect\nDo not press SPACE when there is a warning.\nRestarting practice..."
+                    "<b>Not that one.</b> That sweep had a warning. Practice restarts."
                 );
             }
             else
             {
                 SetInstructionText(
-                    "TUTORIAL: Missed\nPress SPACE when there is no warning.\nRestarting practice..."
+                    "<b>Too slow.</b> That sweep was clear. Practice restarts."
                 );
             }
 
@@ -467,7 +474,7 @@ public class RadarPivot : MonoBehaviour
             warningActive = tutorialSweepIndex % 2 == 1;
 
             SetPhaseText(
-                "TUTORIAL " +
+                "PRACTICE " +
                 (tutorialSweepIndex + 1) +
                 "/" +
                 tutorialSweeps
@@ -476,13 +483,13 @@ public class RadarPivot : MonoBehaviour
             if (warningActive)
             {
                 SetInstructionText(
-                    "TUTORIAL: do not press SPACE (Warning)"
+                    "<b>Warning showing.</b> Do not press."
                 );
             }
             else
             {
                 SetInstructionText(
-                    "TUTORIAL: press SPACE (no warning)"
+                    "<b>Clear sweep.</b> Press SPACE before it comes around."
                 );
             }
         }
@@ -539,7 +546,7 @@ public class RadarPivot : MonoBehaviour
         for (int number = countdownSeconds; number >= 1; number--)
         {
             SetInstructionText(
-                "The real game will start in:\n" +
+                "<b>Practice done.</b> Real run starts in " +
                 number
             );
 
@@ -567,7 +574,7 @@ public class RadarPivot : MonoBehaviour
 
         SetWarningVisible(false);
         SetPhaseText("RADAR WATCH");
-        SetInstructionText("Radar Watch begins (Fast)");
+        SetInstructionText("<b>Go.</b> Press on clear sweeps, hold off when a warning shows.");
 
         temporaryMessageTimer =
             scoredStartMessageDuration;
@@ -742,6 +749,11 @@ public class RadarPivot : MonoBehaviour
 
         tutorialInstructionText.gameObject.SetActive(true);
         tutorialInstructionText.text = message;
+
+        if (tutorialBanner != null)
+        {
+            tutorialBanner.SetActive(true);
+        }
     }
 
     private void HideInstructionText()
@@ -749,6 +761,27 @@ public class RadarPivot : MonoBehaviour
         if (tutorialInstructionText != null)
         {
             tutorialInstructionText.gameObject.SetActive(false);
+        }
+
+        if (tutorialBanner != null)
+        {
+            tutorialBanner.SetActive(false);
+        }
+    }
+
+    private void SetPanelHudVisible(bool visible)
+    {
+        if (panelHud != null)
+        {
+            panelHud.SetActive(visible);
+        }
+    }
+
+    private void SetTimerVisible(bool visible)
+    {
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(visible);
         }
     }
 
@@ -768,9 +801,9 @@ public class RadarPivot : MonoBehaviour
                 );
 
             timerText.text =
-                "PRACTICE SWEEP " +
+                "<b>Practice</b>\nSweep " +
                 currentSweep +
-                " / " +
+                " of " +
                 tutorialSweeps;
 
             return;
@@ -792,7 +825,7 @@ public class RadarPivot : MonoBehaviour
             totalSeconds % 60;
 
         string display =
-            "TIME LEFT " +
+            "<b>Time left</b> " +
             minutes +
             ":" +
             seconds.ToString("00");
@@ -803,7 +836,7 @@ public class RadarPivot : MonoBehaviour
         if (sweepsLeft > 0)
         {
             display +=
-                "     SWEEPS LEFT ~" +
+                "\n<b>Sweeps left</b> " +
                 sweepsLeft;
         }
 
@@ -843,6 +876,11 @@ public class RadarPivot : MonoBehaviour
 
     private void FlashScreen(Color flashColor)
     {
+        if (flashColor == Color.red && passFailCounter != null)
+        {
+            passFailCounter.PlayIncorrect();
+        }
+
         if (greenFlash == null)
         {
             return;
