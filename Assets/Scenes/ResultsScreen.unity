@@ -2696,6 +2696,6 @@ MonoBehaviour:
   popSeconds: 0.18
   settleSeconds: 0.12
   hoverSound: {fileID: 8300000, guid: 1417992c6e464430f933d28350cca694, type: 3}
-  clickSound: {fileID: 8300000, guid: c90db0f162ab64b4899ca39a0376f807, type: 3}
+  clickSound: {fileID: 8300000, guid: 8aaa69e1e935f49babb4658a7bfcf416, type: 3}
   hoverVolume: 0.5
   clickVolume: 0.35

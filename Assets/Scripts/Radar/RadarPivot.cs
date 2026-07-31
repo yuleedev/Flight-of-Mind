@@ -906,9 +906,16 @@ public class RadarPivot : MonoBehaviour
 
     private void FlashScreen(Color flashColor)
     {
-        if (flashColor == Color.red && passFailCounter != null)
+        if (passFailCounter != null)
         {
-            passFailCounter.PlayIncorrect();
+            if (flashColor == Color.red)
+            {
+                passFailCounter.PlayIncorrect();
+            }
+            else if (flashColor == Color.green)
+            {
+                passFailCounter.PlayCorrect();
+            }
         }
 
         if (greenFlash == null)

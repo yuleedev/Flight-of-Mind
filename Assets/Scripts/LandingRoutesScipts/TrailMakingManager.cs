@@ -36,6 +36,7 @@ public class TrailMakingManager : MonoBehaviour
     [Tooltip("Each beacon in a row nudges the pitch up by this much. Resets on an error.")]
     public float chainPitchStep = 0.04f;
     public int chainPitchCap = 12;
+    [Range(0f, 1f)] public float correctVolume = 0.35f;
 
 	public float nextSceneDelay = 3f;
     [Tooltip("Beat after the last waypoint connects, before the next screen appears.")]
@@ -284,7 +285,7 @@ public class TrailMakingManager : MonoBehaviour
         w.MarkVisited();
         currentIndex++;
 
-        Sfx.Play(correctTargetSound, 1f,
+        Sfx.Play(correctTargetSound, correctVolume,
                  1f + chainPitchStep * Mathf.Min(chain, chainPitchCap));
         chain++;
 

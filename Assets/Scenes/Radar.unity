@@ -247,7 +247,7 @@ MonoBehaviour:
   falseNegativeText: {fileID: 429328884}
   averageReactionTimeText: {fileID: 555260561}
   sfxSource: {fileID: 165935849}
-  correctSound: {fileID: 8300000, guid: 55adc7336aa914465b1912852312c4e4, type: 3}
+  correctSound: {fileID: 8300000, guid: df9ea7072242d47688609c22181414fc, type: 3}
   incorrectSound: {fileID: 8300000, guid: 5332192cc6ece4de3883eb9b2ec91ea9, type: 3}
 --- !u!224 &165935848
 RectTransform:
@@ -3303,6 +3303,6 @@ MonoBehaviour:
   popSeconds: 0.18
   settleSeconds: 0.12
   hoverSound: {fileID: 8300000, guid: 1417992c6e464430f933d28350cca694, type: 3}
-  clickSound: {fileID: 8300000, guid: c90db0f162ab64b4899ca39a0376f807, type: 3}
+  clickSound: {fileID: 8300000, guid: 8aaa69e1e935f49babb4658a7bfcf416, type: 3}
   hoverVolume: 0.5
   clickVolume: 0.35

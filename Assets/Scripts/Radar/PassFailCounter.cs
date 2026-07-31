@@ -44,7 +44,6 @@ public class PassFailCounter : MonoBehaviour
     public void AddPass()
     {
         passes++;
-        PlaySound(correctSound);
         UpdateDisplay();
     }
 
@@ -53,8 +52,12 @@ public class PassFailCounter : MonoBehaviour
         passes++;
         totalReactionTime += reactionTime;
         reactionTimeCount++;
-        PlaySound(correctSound);
         UpdateDisplay();
+    }
+
+    public void PlayCorrect()
+    {
+        PlaySound(correctSound);
     }
 
     public void AddFalsePositive()
