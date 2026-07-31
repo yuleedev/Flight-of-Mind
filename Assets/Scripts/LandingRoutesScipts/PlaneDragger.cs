@@ -6,8 +6,8 @@ public class PlaneDragger : MonoBehaviour
     public Camera cam;
 
     [Header("Audio")]
+    [Tooltip("Plays when the plane is picked up and again when it is put down.")]
     public AudioClip selectSound;
-    public AudioClip deselectSound;
     public AudioClip dragLoop;
     [Range(0f, 1f)] public float dragLoopVolume = 0.35f;
 
@@ -68,7 +68,7 @@ public class PlaneDragger : MonoBehaviour
             if (drawing)
             {
                 drawing = false;
-                Sfx.Play(deselectSound);
+                Sfx.Play(selectSound);
                 if (loopSource != null) loopSource.Stop();
             }
             else if (col.OverlapPoint(mousePos))

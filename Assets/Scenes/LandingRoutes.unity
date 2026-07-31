@@ -4261,7 +4261,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   cam: {fileID: 0}
   selectSound: {fileID: 8300000, guid: 077d8d5a4b8354af6938a0f34871acdb, type: 3}
-  deselectSound: {fileID: 8300000, guid: 68a21ca94f0fe4b3dad7eed91d0558fc, type: 3}
   dragLoop: {fileID: 0}
   dragLoopVolume: 0.35
   playArea: {fileID: 789139688}
