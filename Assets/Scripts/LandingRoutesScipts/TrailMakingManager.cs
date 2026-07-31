@@ -29,6 +29,14 @@ public class TrailMakingManager : MonoBehaviour
     public TMP_Text timerText;
     public TMP_Text errorCountText;
 
+	[Header("Audio")]
+    public AudioClip correctTargetSound;
+    public AudioClip wrongTargetSound;
+    public AudioClip roundCompleteSound;
+    [Tooltip("Each beacon in a row nudges the pitch up by this much. Resets on an error.")]
+    public float chainPitchStep = 0.04f;
+    public int chainPitchCap = 12;
+
 	public float nextSceneDelay = 3f;
     [Tooltip("Beat after the last waypoint connects, before the next screen appears.")]
     public float endOfRoundPause = 0.9f;
@@ -39,6 +47,7 @@ public class TrailMakingManager : MonoBehaviour
     bool finished;
     bool inTutorial;
     Waypoint lastWaypointOver;
+    int chain;
 
     float timeA;
     int errorsA;
@@ -88,6 +97,7 @@ public class TrailMakingManager : MonoBehaviour
         errors = 0;
         finished = false;
         lastWaypointOver = null;
+        chain = 0;
 
         for (int i = 0; i < route.Length; i++)
         {
@@ -259,6 +269,8 @@ public class TrailMakingManager : MonoBehaviour
         else if (over.order > currentIndex)
         {
             errors++;
+            chain = 0;
+            Sfx.Play(wrongTargetSound);
             UpdateErrorDisplay();
             if (messagePanel != null)
             {
@@ -272,6 +284,10 @@ public class TrailMakingManager : MonoBehaviour
         w.MarkVisited();
         currentIndex++;
 
+        Sfx.Play(correctTargetSound, 1f,
+                 1f + chainPitchStep * Mathf.Min(chain, chainPitchCap));
+        chain++;
+
         if (messagePanel != null) messagePanel.SetActive(false);
 
         if (currentIndex >= route.Length)
@@ -283,6 +299,7 @@ public class TrailMakingManager : MonoBehaviour
     void FinishRound()
     {
         finished = true;
+        Sfx.Play(roundCompleteSound);
         float total = Time.time - startTime;
 
         if (timerText != null) timerText.text = "Time: " + total.ToString("F1") + "s";

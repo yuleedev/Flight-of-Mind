@@ -218,6 +218,9 @@ MonoBehaviour:
   referenceImpactSpeed: 1400
   maxCollisionVolume: 0.85
   fallSoundVolume: 0.6
+  pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
+  dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+
 --- !u!1 &204939171
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,7 +750,7 @@ RectTransform:
   m_GameObject: {fileID: 397707983}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5.897259, y: 6.4130096, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1957430161}
@@ -756,7 +759,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 470, y: -337}
-  m_SizeDelta: {x: 81.3742, y: 58.3482}
+  m_SizeDelta: {x: 420, y: 203}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &397707985
 MonoBehaviour:
@@ -1414,6 +1417,9 @@ MonoBehaviour:
   referenceImpactSpeed: 1400
   maxCollisionVolume: 0.85
   fallSoundVolume: 0.6
+  pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
+  dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+
 --- !u!1 &1087090273
 GameObject:
   m_ObjectHideFlags: 0
@@ -1761,6 +1767,9 @@ MonoBehaviour:
   resultSeconds: 2
   finalResultSeconds: 4
   finalPanelHeight: 130
+  solvedSound: {fileID: 8300000, guid: 3c26b3f59b8544fe5b80f9e2de23645c, type: 3}
+  optimalSolveSound: {fileID: 8300000, guid: 8155f127bfc0d4c7c9404874b3de0dc7, type: 3}
+
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0
@@ -1966,6 +1975,9 @@ MonoBehaviour:
   referenceImpactSpeed: 1400
   maxCollisionVolume: 0.85
   fallSoundVolume: 0.6
+  pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
+  dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+
 --- !u!1 &1545744770
 GameObject:
   m_ObjectHideFlags: 0
@@ -2757,8 +2769,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 110
+  m_fontSizeBase: 110
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3126,3 +3138,7 @@ MonoBehaviour:
   pressScale: 0.99
   popSeconds: 0.18
   settleSeconds: 0.12
+  hoverSound: {fileID: 8300000, guid: 1417992c6e464430f933d28350cca694, type: 3}
+  clickSound: {fileID: 8300000, guid: c90db0f162ab64b4899ca39a0376f807, type: 3}
+  hoverVolume: 0.5
+  clickVolume: 0.35

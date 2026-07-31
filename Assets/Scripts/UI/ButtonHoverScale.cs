@@ -11,6 +11,11 @@ public class ButtonHoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private float popSeconds = 0.18f;
     [SerializeField] private float settleSeconds = 0.12f;
 
+    [SerializeField] private AudioClip hoverSound;
+    [SerializeField] private AudioClip clickSound;
+    [SerializeField, Range(0f, 1f)] private float hoverVolume = 0.5f;
+    [SerializeField, Range(0f, 1f)] private float clickVolume = 0.35f;
+
     private Vector3 baseScale = Vector3.one;
     private Coroutine animation;
     private bool hovering;
@@ -31,6 +36,7 @@ public class ButtonHoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerEnter(PointerEventData eventData)
     {
         hovering = true;
+        Sfx.Play(hoverSound, hoverVolume);
         ScaleTo(hoverScale, popSeconds, true);
     }
 
@@ -42,6 +48,7 @@ public class ButtonHoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        Sfx.Play(clickSound, clickVolume);
         ScaleTo(pressScale, 0.06f, false);
     }
 

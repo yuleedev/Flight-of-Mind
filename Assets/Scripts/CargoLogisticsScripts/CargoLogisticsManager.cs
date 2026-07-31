@@ -45,6 +45,10 @@ public class CargoLogisticsManager : MonoBehaviour
     [Tooltip("Cost multiplier on hesitation between moves.")]
     [SerializeField, Range(0f, 3f)] private float subsequentThinkingWeight = 2.33f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip solvedSound;
+    [SerializeField] private AudioClip optimalSolveSound;
+
     [Header("Result Panel Timing")]
     [Tooltip("How long the result panel stays up between problems.")]
     [SerializeField] private float resultSeconds = 2f;
@@ -204,6 +208,9 @@ void Awake()
 
         CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves,
                                      ruleViolations, initial, subsequent, animation, total);
+
+        bool optimal = moveCount <= currentOptimalMoves && ruleViolations == 0;
+        Sfx.Play(optimal && optimalSolveSound != null ? optimalSolveSound : solvedSound);
 
         Time.timeScale = 0f;
 

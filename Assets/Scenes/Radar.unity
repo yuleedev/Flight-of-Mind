@@ -451,8 +451,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 100
-  m_fontSizeBase: 100
+  m_fontSize: 110
+  m_fontSizeBase: 110
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1960,7 +1960,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 273, y: -265.84998}
-  m_SizeDelta: {x: 290.0514, y: 139.8787}
+  m_SizeDelta: {x: 420, y: 203}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1390422267
 MonoBehaviour:
@@ -3302,3 +3302,7 @@ MonoBehaviour:
   pressScale: 0.99
   popSeconds: 0.18
   settleSeconds: 0.12
+  hoverSound: {fileID: 8300000, guid: 1417992c6e464430f933d28350cca694, type: 3}
+  clickSound: {fileID: 8300000, guid: c90db0f162ab64b4899ca39a0376f807, type: 3}
+  hoverVolume: 0.5
+  clickVolume: 0.35
