@@ -1888,6 +1888,8 @@ MonoBehaviour:
   correctVolume: 0.35
   nextSceneDelay: 1.5
   endOfRoundPause: 0.9
+  confettiCount: 40
+
 --- !u!4 &583643323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2511189456752140204, guid: 123494914153344dc84a995cf621d47c, type: 3}
@@ -3358,7 +3360,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 403, y: -2.0000}
+  m_AnchoredPosition: {x: 403, y: 43.0000}
   m_SizeDelta: {x: 1009.0771, y: 571.9425}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1013341176
@@ -8371,7 +8373,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 403, y: 395.9712}
+  m_AnchoredPosition: {x: 403, y: 440.9712}
   m_SizeDelta: {x: 1009.0771, y: 96}
   m_Pivot: {x: 0.5, y: 0.5}
 

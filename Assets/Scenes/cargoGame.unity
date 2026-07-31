@@ -643,7 +643,7 @@ MonoBehaviour:
     <b>3.</b>   Use as few moves as you can.</align>
 
 
-    <size=85%>Press Start when you are ready.</size>'
+    <size=85%><voffset=1em>Press Start when you are ready.</voffset></size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}

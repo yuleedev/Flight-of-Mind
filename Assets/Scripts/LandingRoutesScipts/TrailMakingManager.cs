@@ -38,6 +38,10 @@ public class TrailMakingManager : MonoBehaviour
     public int chainPitchCap = 12;
     [Range(0f, 1f)] public float correctVolume = 0.35f;
 
+    [Header("Finish")]
+    [Tooltip("Confetti pieces thrown from the final waypoint. 0 turns it off.")]
+    public int confettiCount = 40;
+
 	public float nextSceneDelay = 3f;
     [Tooltip("Beat after the last waypoint connects, before the next screen appears.")]
     public float endOfRoundPause = 0.9f;
@@ -295,6 +299,9 @@ public class TrailMakingManager : MonoBehaviour
 
         if (currentIndex >= route.Length)
         {
+            if (confettiCount > 0)
+                ConfettiBurst.Play(w.transform.position, confettiCount);
+
             FinishRound();
         }
     }
