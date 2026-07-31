@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
 
@@ -29,6 +30,8 @@ public class TrailMakingManager : MonoBehaviour
     public TMP_Text errorCountText;
 
 	public float nextSceneDelay = 3f;
+    [Tooltip("Beat after the last waypoint connects, before the next screen appears.")]
+    public float endOfRoundPause = 0.9f;
     Waypoint[] route;
     int currentIndex;
     int errors;
@@ -151,6 +154,12 @@ public class TrailMakingManager : MonoBehaviour
 
     void StartPartA()
     {
+        SwapToPartA();
+        BeginTiming();
+    }
+
+    void SwapToPartA()
+    {
         inTutorial = false;
         part = TestPart.A;
         route = routeA;
@@ -159,25 +168,54 @@ public class TrailMakingManager : MonoBehaviour
         if (partAObjects != null) partAObjects.SetActive(true);
         if (partBObjects != null) partBObjects.SetActive(false);
 
-        if (timerText != null) timerText.gameObject.SetActive(true);
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(true);
+            timerText.text = "Time: 0.0s";
+        }
+
         if (errorCountText != null) errorCountText.gameObject.SetActive(true);
 
         SetupRound();
+        finished = true;
     }
 
     public void OnReadyClicked()
 	{
     	if (readyPanel != null) readyPanel.SetActive(false);
-    	if (partAObjects != null) partAObjects.SetActive(false);
-    	if (partBObjects != null) partBObjects.SetActive(true);
-
-    	if (timerText != null) timerText.gameObject.SetActive(true);
-    	if (errorCountText != null) errorCountText.gameObject.SetActive(true);
-
-    	part = TestPart.B;
-    	route = routeB;
-    	SetupRound();
+    	StartPartB();
 	}
+
+    void StartPartB()
+    {
+        SwapToPartB();
+        BeginTiming();
+    }
+
+    void SwapToPartB()
+    {
+        if (partAObjects != null) partAObjects.SetActive(false);
+        if (partBObjects != null) partBObjects.SetActive(true);
+
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(true);
+            timerText.text = "Time: 0.0s";
+        }
+
+        if (errorCountText != null) errorCountText.gameObject.SetActive(true);
+
+        part = TestPart.B;
+        route = routeB;
+        SetupRound();
+        finished = true;
+    }
+
+    void BeginTiming()
+    {
+        startTime = Time.time;
+        finished = false;
+    }
 
     public void Draw(Vector3 penPos)
     {
@@ -251,11 +289,7 @@ public class TrailMakingManager : MonoBehaviour
 
         if (inTutorial)
         {
-            if (timerText != null) timerText.gameObject.SetActive(false);
-            if (errorCountText != null) errorCountText.gameObject.SetActive(false);
-            if (tutorialObjects != null) tutorialObjects.SetActive(false);
-            if (tutorialDonePanel != null) tutorialDonePanel.SetActive(true);
-            else StartPartA();
+            StartCoroutine(EndTutorialRound());
             return;
         }
 
@@ -264,9 +298,7 @@ public class TrailMakingManager : MonoBehaviour
             timeA = total;
             errorsA = errors;
             TrailMakingResults.Record("A", timeA, errorsA);
-            if (readyPanel != null) readyPanel.SetActive(true);
-			if (timerText != null) timerText.gameObject.SetActive(false);
-    		if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+            StartCoroutine(EndPartA());
         }
         else
 		{
@@ -278,6 +310,27 @@ public class TrailMakingManager : MonoBehaviour
     		ShowResults();
     		Invoke(nameof(GoToCargo), nextSceneDelay);
 		}
+    }
+
+    IEnumerator EndTutorialRound()
+    {
+        yield return new WaitForSecondsRealtime(endOfRoundPause);
+
+        if (timerText != null) timerText.gameObject.SetActive(false);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+        if (tutorialObjects != null) tutorialObjects.SetActive(false);
+
+        if (tutorialDonePanel != null) tutorialDonePanel.SetActive(true);
+        else StartPartA();
+    }
+
+    IEnumerator EndPartA()
+    {
+        yield return new WaitForSecondsRealtime(endOfRoundPause);
+
+        if (readyPanel != null) readyPanel.SetActive(true);
+        if (timerText != null) timerText.gameObject.SetActive(false);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(false);
     }
 
     void ShowResults()

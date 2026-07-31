@@ -49,6 +49,19 @@ public class SceneTransition : MonoBehaviour
         instance.Begin(null, buildIndex);
     }
 
+    public static void Play(System.Action onCovered, System.Action onRevealed = null)
+    {
+        if (instance == null || instance.busy)
+        {
+            onCovered?.Invoke();
+            onRevealed?.Invoke();
+            return;
+        }
+
+        instance.busy = true;
+        instance.StartCoroutine(instance.RunSwap(onCovered, onRevealed));
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Install()
     {
@@ -135,6 +148,35 @@ public class SceneTransition : MonoBehaviour
 
         coverRect.gameObject.SetActive(false);
         busy = false;
+    }
+
+    private IEnumerator RunSwap(System.Action onCovered, System.Action onRevealed)
+    {
+        coverRect.gameObject.SetActive(true);
+
+        cover.fillOrigin = (int)Image.OriginVertical.Top;
+        yield return Wipe(0f, 1f, CoverSeconds);
+
+        cover.fillAmount = 1f;
+        onCovered?.Invoke();
+
+        float held = 0f;
+
+        while (held < HoldSeconds)
+        {
+            held += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        yield return Settle();
+
+        cover.fillOrigin = (int)Image.OriginVertical.Bottom;
+        yield return Wipe(1f, 0f, RevealSeconds);
+
+        coverRect.gameObject.SetActive(false);
+        busy = false;
+
+        onRevealed?.Invoke();
     }
 
     private IEnumerator Settle()

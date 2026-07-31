@@ -537,6 +537,7 @@ GameObject:
   - component: {fileID: 145739424}
   - component: {fileID: 145739423}
   - component: {fileID: 145739422}
+  - component: {fileID: 1600000001}
   m_Layer: 5
   m_Name: PlayButton
   m_TagString: Untagged
@@ -562,7 +563,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -741, y: -361}
-  m_SizeDelta: {x: 322, y: 231}
+  m_SizeDelta: {x: 296, y: 213}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &145739422
 MonoBehaviour:
@@ -586,12 +587,12 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.88, g: 0.88, b: 0.88, a: 1}
+    m_PressedColor: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.08
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -1955,6 +1956,7 @@ GameObject:
   - component: {fileID: 1226165411}
   - component: {fileID: 1226165410}
   - component: {fileID: 1226165409}
+  - component: {fileID: 1600000002}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -2024,12 +2026,12 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.88, g: 0.88, b: 0.88, a: 1}
+    m_PressedColor: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.08
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -2889,6 +2891,7 @@ GameObject:
   - component: {fileID: 2036111317}
   - component: {fileID: 2036111316}
   - component: {fileID: 2036111315}
+  - component: {fileID: 1600000003}
   m_Layer: 5
   m_Name: CreditsButton
   m_TagString: Untagged
@@ -2914,7 +2917,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -300, y: -361}
-  m_SizeDelta: {x: 436, y: 231}
+  m_SizeDelta: {x: 401, y: 213}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2036111315
 MonoBehaviour:
@@ -2938,12 +2941,12 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.88, g: 0.88, b: 0.88, a: 1}
+    m_PressedColor: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.08
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -3357,6 +3360,7 @@ GameObject:
   - component: {fileID: 2139046406}
   - component: {fileID: 2139046405}
   - component: {fileID: 2139046404}
+  - component: {fileID: 1600000004}
   m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -3382,7 +3386,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 218.5, y: -361}
-  m_SizeDelta: {x: 479, y: 231}
+  m_SizeDelta: {x: 441, y: 213}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2139046404
 MonoBehaviour:
@@ -3406,12 +3410,12 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.88, g: 0.88, b: 0.88, a: 1}
+    m_PressedColor: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.08
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -3804,6 +3808,7 @@ GameObject:
   - component: {fileID: 900000015}
   - component: {fileID: 900000016}
   - component: {fileID: 900000017}
+  - component: {fileID: 1600000005}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -3891,12 +3896,12 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.88, g: 0.88, b: 0.88, a: 1}
+    m_PressedColor: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.08
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -4432,3 +4437,93 @@ MonoBehaviour:
   maxHeight: 260
   scrollbarWidth: 8
   scrollSensitivity: 24
+
+--- !u!114 &1600000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 145739420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3d64f27b1e4c5fa02e91d7c6b45083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverScale
+  restScale: 0.97
+  hoverScale: 1.03
+  pressScale: 0.99
+  popSeconds: 0.18
+  settleSeconds: 0.12
+
+--- !u!114 &1600000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226165407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3d64f27b1e4c5fa02e91d7c6b45083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverScale
+  restScale: 0.97
+  hoverScale: 1.03
+  pressScale: 0.99
+  popSeconds: 0.18
+  settleSeconds: 0.12
+
+--- !u!114 &1600000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2036111313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3d64f27b1e4c5fa02e91d7c6b45083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverScale
+  restScale: 0.97
+  hoverScale: 1.03
+  pressScale: 0.99
+  popSeconds: 0.18
+  settleSeconds: 0.12
+
+--- !u!114 &1600000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2139046402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3d64f27b1e4c5fa02e91d7c6b45083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverScale
+  restScale: 0.97
+  hoverScale: 1.03
+  pressScale: 0.99
+  popSeconds: 0.18
+  settleSeconds: 0.12
+
+--- !u!114 &1600000005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900000012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3d64f27b1e4c5fa02e91d7c6b45083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverScale
+  restScale: 0.97
+  hoverScale: 1.03
+  pressScale: 0.99
+  popSeconds: 0.18
+  settleSeconds: 0.12
