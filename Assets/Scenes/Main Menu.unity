@@ -4252,6 +4252,7 @@ GameObject:
   - component: {fileID: 900000029}
   - component: {fileID: 900000030}
   - component: {fileID: 900000031}
+  - component: {fileID: 900000032}
   m_Layer: 5
   m_Name: CreditsBody
   m_TagString: Untagged
@@ -4306,15 +4307,25 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Design and Development
-[Your name here]
+  m_text: '<b>Design and Development</b>
 
-Cognitive tasks adapted from the Trail Making Test,
-the Tower of London, and Go/No-Go paradigms.
+    Yulee Oh, Hannah Huang, Connor Wang,
 
-Typeface: Atkinson Hyperlegible (Braille Institute)
+    Daniel Li, Nico Ortiz Neidhart
 
-GALA 2026
+
+    <b>Faculty Mentors</b>
+
+    Professor Sang Nam and Professor James Casey
+
+    George Mason University
+
+
+    Cognitive tasks adapted from the Trail Making Test,
+
+    the Tower of London, and the Conners''
+
+    Continuous Performance Test.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
@@ -4406,3 +4417,18 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &900000032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900000027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f7c21d84ab54e0ea9c6d0517b2e4f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CreditsScroller
+  maxHeight: 260
+  scrollbarWidth: 8
+  scrollSensitivity: 24
