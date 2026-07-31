@@ -2113,14 +2113,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Press Space once during each normal radar sweep.
+  m_text: '<size=120%><b>Radar Watch</b></size>
 
 
-    Do not press when
-    the warning symbol appears.
+    <align=left><b>1.</b>   Press SPACE once during each clear sweep.
 
 
-    Press Start when you''re ready.'
+    <b>2.</b>   When the warning symbol is showing, do nothing.</align>
+
+
+    <size=85%>Press Start when you are ready.</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
@@ -2151,8 +2153,8 @@ MonoBehaviour:
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMin: 26
+  m_fontSizeMax: 47.65
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 4096

@@ -50,6 +50,8 @@ public class TrailMakingManager : MonoBehaviour
     Waypoint lastWaypointOver;
     int chain;
 
+    public bool IsFinished => finished;
+
     float timeA;
     int errorsA;
     float timeB;
@@ -300,6 +302,13 @@ public class TrailMakingManager : MonoBehaviour
     void FinishRound()
     {
         finished = true;
+
+        if (plane != null)
+        {
+            PlaneDragger dragger = plane.GetComponent<PlaneDragger>();
+            if (dragger != null) dragger.StopDrawing();
+        }
+
         Sfx.Play(roundCompleteSound);
         float total = Time.time - startTime;
 

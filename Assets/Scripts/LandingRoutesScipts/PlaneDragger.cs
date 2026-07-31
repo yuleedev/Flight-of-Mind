@@ -37,10 +37,26 @@ public class PlaneDragger : MonoBehaviour
         }
     }
 
+    public void StopDrawing()
+    {
+        drawing = false;
+
+        if (loopSource != null)
+        {
+            loopSource.Stop();
+        }
+    }
+
     void Update()
     {
         if (Mouse.current == null)
         {
+            return;
+        }
+
+        if (TrailMakingManager.Instance != null && TrailMakingManager.Instance.IsFinished)
+        {
+            StopDrawing();
             return;
         }
 

@@ -1884,10 +1884,9 @@ MonoBehaviour:
   roundCompleteSound: {fileID: 8300000, guid: 1713b42e0263647aea8fc8fa12e87fe4, type: 3}
   chainPitchStep: 0.04
   chainPitchCap: 12
+  correctVolume: 0.35
   nextSceneDelay: 1.5
   endOfRoundPause: 0.9
-  correctVolume: 0.35
-
 --- !u!4 &583643323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2511189456752140204, guid: 123494914153344dc84a995cf621d47c, type: 3}
@@ -3381,19 +3380,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Guide the plane to connect the points in order.
+  m_text: '<size=120%><b>Landing Routes</b></size>
 
 
-    Hold and drag from
-    the plane to draw your path. Reach the numbers in order: 1, 2, 3, and so on.
+    <align=left><b>1.</b>   Click the plane to pick it up, then move the mouse to draw your route.
 
 
-    You
-    cannot skip around. If you touch a point out of order, it counts as an error.
+    <b>2.</b>   Reach the points in order: 1, 2, 3, and so on.
 
 
-    Let''s
-    start with a short practice.'
+    <b>3.</b>   Touching a point out of order counts as an error.</align>
+
+
+    <size=85%>We will start with a short practice.</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
@@ -3423,9 +3422,9 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 26
+  m_fontSizeMax: 50.0
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 4096
@@ -6322,18 +6321,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Part B
+  m_text: '<size=120%><b>Part B</b></size>
 
 
-    This time alternate between numbers and letters: 1, A, 2,
-    B, 3, C, and so on.
+    This time alternate numbers and letters:
 
 
-    The order still matters. Reach each point in sequence,
-    and do not touch a point before it is your turn.
+    <size=140%><b>1     A     2     B     3     C</b></size>
 
 
-    Press Ready to begin.'
+    The order still matters. A point out of order counts as an error.
+
+
+    <size=85%>Press Ready to begin.</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
@@ -6363,9 +6363,9 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 26
+  m_fontSizeMax: 50.0
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 4096
@@ -6778,14 +6778,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Practice complete.
+  m_text: '<size=120%><b>Practice complete</b></size>
 
 
-    Now the real test. Part A: connect the numbers
-    in order, 1, 2, 3, and so on.
+    Now the real route. Connect the numbers in order:
 
 
-    Press Continue when you are ready.'
+    <size=140%><b>1     2     3     4     5</b></size>
+
+
+    <size=85%>Press Ready to start Part A.</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
@@ -6815,9 +6817,9 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 26
+  m_fontSizeMax: 50.0
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 4096
