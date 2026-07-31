@@ -36,7 +36,7 @@ public class TrailMakingManager : MonoBehaviour
     [Tooltip("Each beacon in a row nudges the pitch up by this much. Resets on an error.")]
     public float chainPitchStep = 0.04f;
     public int chainPitchCap = 12;
-    [Range(0f, 1f)] public float correctVolume = 0.35f;
+    [Range(0f, 1f)] public float correctVolume = 0.18f;
 
     [Header("Finish")]
     [Tooltip("Confetti pieces thrown from the final waypoint. 0 turns it off.")]

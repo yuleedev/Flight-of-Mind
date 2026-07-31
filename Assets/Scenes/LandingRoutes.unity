@@ -1885,7 +1885,7 @@ MonoBehaviour:
   roundCompleteSound: {fileID: 8300000, guid: 1713b42e0263647aea8fc8fa12e87fe4, type: 3}
   chainPitchStep: 0.04
   chainPitchCap: 12
-  correctVolume: 0.35
+  correctVolume: 0.18
   nextSceneDelay: 1.5
   endOfRoundPause: 0.9
   confettiCount: 40
