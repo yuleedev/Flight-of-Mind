@@ -962,8 +962,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4283905068
-  m_fontColor: {r: 0.17254902, g: 0.20392157, b: 0.34117648, a: 1}
+    rgba: 4292541181
+  m_fontColor: {r: 0.996, g: 0.984, b: 0.855, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3247,7 +3247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.17254902, g: 0.20392157, b: 0.34117648, a: 1}
+  m_Color: {r: 0.282, g: 0.306, b: 0.408, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3278,8 +3278,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoundedPanel
   cornerRadius: 26
   borderThickness: 5
-  borderColor: {r: 0.17254902, g: 0.20392157, b: 0.34117648, a: 1}
-  fillColor: {r: 0.99607843, g: 0.9843137, b: 0.85490197, a: 1}
+  borderColor: {r: 0.282, g: 0.306, b: 0.408, a: 1}
+  fillColor: {r: 0.204, g: 0.204, b: 0.314, a: 1}
   accentColor: {r: 0.09, g: 0.66, b: 0.55, a: 1}
   accentWidth: 0
   dropShadow: 1

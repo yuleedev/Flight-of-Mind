@@ -6,8 +6,8 @@ public class RoundedPanel : MonoBehaviour
 {
     [SerializeField] private float cornerRadius = 26f;
     [SerializeField] private float borderThickness = 5f;
-    [SerializeField] private Color borderColor = new Color(0.173f, 0.204f, 0.341f, 1f);
-    [SerializeField] private Color fillColor = new Color(0.996f, 0.984f, 0.855f, 1f);
+    [SerializeField] private Color borderColor = new Color(0.282f, 0.306f, 0.408f, 1f);
+    [SerializeField] private Color fillColor = new Color(0.204f, 0.204f, 0.314f, 1f);
     [SerializeField] private Color accentColor = new Color(0.09f, 0.66f, 0.55f, 1f);
     [SerializeField] private float accentWidth = 0f;
     [SerializeField] private bool dropShadow = true;

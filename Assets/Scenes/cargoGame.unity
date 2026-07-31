@@ -1751,6 +1751,7 @@ MonoBehaviour:
   - {fileID: 280908074}
   - {fileID: 695764296}
   startPanel: {fileID: 1307316701}
+  resultFont: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   participantAge: 16
   expectedTimeMultiplier: 0.76
   paceTolerance: 0.88

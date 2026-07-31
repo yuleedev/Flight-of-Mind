@@ -28,6 +28,8 @@ public class CargoLogisticsManager : MonoBehaviour
 
     [Header("Instructions")]
     [SerializeField] private GameObject startPanel;
+    [Tooltip("Font for the result banner. Leave empty to use the TextMeshPro default.")]
+    [SerializeField] private TMPro.TMP_FontAsset resultFont;
 
     [Header("Participant")]
     [Tooltip("Fallback only. Ignored if an earlier scene already called CargoLogisticsNorms.SetAge.")]
@@ -74,6 +76,8 @@ void Awake()
 
         if (!CargoLogisticsNorms.AgeSet)
             CargoLogisticsNorms.SetAge(participantAge);
+
+        ResultDisplay.SetFont(resultFont);
         ApplyPacingSettings();
     }
 

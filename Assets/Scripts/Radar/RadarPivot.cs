@@ -411,6 +411,8 @@ public class RadarPivot : MonoBehaviour
                 ? !pressedThisRotation
                 : pressedThisRotation;
 
+        bool alreadyShownFeedback = pressedThisRotation;
+
         if (correctResponse)
         {
             if (warningActive &&
@@ -419,7 +421,10 @@ public class RadarPivot : MonoBehaviour
                 warningTriangle.color = Color.green;
             }
 
-            FlashScreen(Color.green);
+            if (!alreadyShownFeedback)
+            {
+                FlashScreen(Color.green);
+            }
 
             if (warningActive)
             {
@@ -448,7 +453,10 @@ public class RadarPivot : MonoBehaviour
                 warningTriangle.color = Color.red;
             }
 
-            FlashScreen(Color.red);
+            if (!alreadyShownFeedback)
+            {
+                FlashScreen(Color.red);
+            }
 
             if (warningActive)
             {
