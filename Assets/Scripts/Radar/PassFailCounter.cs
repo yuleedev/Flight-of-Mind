@@ -107,7 +107,7 @@ public class PassFailCounter : MonoBehaviour
             passText.text = Row("Correct", passes.ToString());
 
         if (failText != null)
-            failText.text = Row("Errors", fails.ToString());
+            failText.text = Row("Total errors", fails.ToString());
 
         if (falsePositiveText != null)
             falsePositiveText.text = Row("Wrong press", falsePositives.ToString());

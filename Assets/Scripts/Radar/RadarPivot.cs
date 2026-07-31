@@ -13,6 +13,10 @@ public class RadarPivot : MonoBehaviour
     [SerializeField] private float tutorialFeedbackDuration = 1.5f;
     [SerializeField] private float scoredStartMessageDuration = 2f;
     [SerializeField] private int countdownSeconds = 3;
+    [Tooltip("Pause with the sweep line parked at the start before each scored sweep begins.")]
+    [SerializeField] private float sweepStartDelay = 0.5f;
+    [Tooltip("Longer version of the same pause during practice.")]
+    [SerializeField] private float tutorialSweepStartDelay = 1.2f;
 
     [SerializeField] private GameObject instructionsPanel;
     [Tooltip("The readout block on the blue panel. Hidden until the run starts.")]
@@ -68,6 +72,8 @@ public class RadarPivot : MonoBehaviour
     private bool pressedThisRotation;
     private bool warningActive;
     private bool waitingForNextRotation;
+    private bool waitingToStartSweep;
+    private float sweepStartTimer;
 
     private Color warningStartColor;
 
@@ -93,6 +99,7 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
+        waitingToStartSweep = false;
 
         if (warningTriangle != null)
         {
@@ -143,6 +150,7 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
+        waitingToStartSweep = false;
 
         transform.localRotation = Quaternion.identity;
 
@@ -226,6 +234,18 @@ public class RadarPivot : MonoBehaviour
                 {
                     StartNewRotation();
                 }
+            }
+
+            return;
+        }
+
+        if (waitingToStartSweep)
+        {
+            sweepStartTimer -= Time.deltaTime;
+
+            if (sweepStartTimer <= 0f)
+            {
+                BeginSweep();
             }
 
             return;
@@ -460,9 +480,11 @@ public class RadarPivot : MonoBehaviour
     private void StartNewRotation()
     {
         pressedThisRotation = false;
-        rotationStartTime = Time.time;
+        degreesRotated = 0f;
+        transform.localRotation = Quaternion.identity;
 
         UpdateTimerDisplay();
+        SetWarningVisible(false);
 
         if (warningTriangle != null)
         {
@@ -480,6 +502,38 @@ public class RadarPivot : MonoBehaviour
                 tutorialSweeps
             );
 
+            SetInstructionText("<b>Get ready.</b> Watch where the sweep starts.");
+        }
+        else
+        {
+            warningActive =
+                Random.value < warningChance;
+
+            SetPhaseText("RADAR WATCH");
+        }
+
+        float delay =
+            tutorialActive
+                ? tutorialSweepStartDelay
+                : sweepStartDelay;
+
+        if (delay > 0f)
+        {
+            waitingToStartSweep = true;
+            sweepStartTimer = delay;
+            return;
+        }
+
+        BeginSweep();
+    }
+
+    private void BeginSweep()
+    {
+        waitingToStartSweep = false;
+        rotationStartTime = Time.time;
+
+        if (tutorialActive)
+        {
             if (warningActive)
             {
                 SetInstructionText(
@@ -492,13 +546,6 @@ public class RadarPivot : MonoBehaviour
                     "<b>Clear sweep.</b> Press SPACE before it comes around."
                 );
             }
-        }
-        else
-        {
-            warningActive =
-                Random.value < warningChance;
-
-            SetPhaseText("RADAR WATCH");
         }
 
         SetWarningVisible(warningActive);
@@ -568,6 +615,7 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
+        waitingToStartSweep = false;
         transitionTimer = 0f;
 
         transform.localRotation = Quaternion.identity;
@@ -801,7 +849,7 @@ public class RadarPivot : MonoBehaviour
                 );
 
             timerText.text =
-                "<b>Practice</b>\nSweep " +
+                "<b>Practice</b> " +
                 currentSweep +
                 " of " +
                 tutorialSweeps;
@@ -824,39 +872,13 @@ public class RadarPivot : MonoBehaviour
         int seconds =
             totalSeconds % 60;
 
-        string display =
+        timerText.text =
             "<b>Time left</b> " +
             minutes +
             ":" +
             seconds.ToString("00");
-
-        int sweepsLeft =
-            SweepsRemaining(remainingTime);
-
-        if (sweepsLeft > 0)
-        {
-            display +=
-                "\n<b>Sweeps left</b> " +
-                sweepsLeft;
-        }
-
-        timerText.text = display;
     }
 
-    private int SweepsRemaining(float remainingTime)
-    {
-        if (rotationSpeed <= 0f)
-        {
-            return 0;
-        }
-
-        float secondsPerSweep =
-            360f / rotationSpeed;
-
-        return Mathf.CeilToInt(
-            remainingTime / secondsPerSweep
-        );
-    }
 
     private void UpdateFlash()
     {
