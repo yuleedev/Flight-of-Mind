@@ -2,7 +2,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RadarPivot : MonoBehaviour
@@ -14,15 +13,25 @@ public class RadarPivot : MonoBehaviour
     [SerializeField] private float tutorialFeedbackDuration = 1.5f;
     [SerializeField] private float scoredStartMessageDuration = 2f;
     [SerializeField] private int countdownSeconds = 3;
+    [Tooltip("Pause with the sweep line parked at the start before each scored sweep begins.")]
+    [SerializeField] private float sweepStartDelay = 0.5f;
+    [Tooltip("Longer version of the same pause during practice.")]
+    [SerializeField] private float tutorialSweepStartDelay = 1.2f;
 
     [SerializeField] private GameObject instructionsPanel;
+    [Tooltip("The readout block on the blue panel. Hidden until the run starts.")]
+    [SerializeField] private GameObject panelHud;
+    [Tooltip("Backing plate behind the instruction line at the top of the screen.")]
+    [SerializeField] private GameObject tutorialBanner;
 
     [SerializeField] private TMP_Text phaseText;
     [SerializeField] private TMP_Text tutorialInstructionText;
     [SerializeField] private TMP_Text timerText;
 
     [SerializeField] private GameObject completionPanel;
-    [SerializeField] private TMP_Text completionText;
+
+    [SerializeField] private string resultsSceneName = "ResultsScreen";
+    [SerializeField] private float resultsTransitionDelay = 0.75f;
 
     [SerializeField] private Image greenFlash;
     [SerializeField] private float flashDuration = 0.2f;
@@ -63,6 +72,8 @@ public class RadarPivot : MonoBehaviour
     private bool pressedThisRotation;
     private bool warningActive;
     private bool waitingForNextRotation;
+    private bool waitingToStartSweep;
+    private float sweepStartTimer;
 
     private Color warningStartColor;
 
@@ -88,6 +99,7 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
+        waitingToStartSweep = false;
 
         if (warningTriangle != null)
         {
@@ -98,7 +110,8 @@ public class RadarPivot : MonoBehaviour
         SetWarningVisible(false);
         SetPhaseText("READY");
         HideInstructionText();
-        UpdateTimerDisplay();
+        SetTimerVisible(false);
+        SetPanelHudVisible(false);
 
         if (instructionsPanel != null)
         {
@@ -137,6 +150,7 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
+        waitingToStartSweep = false;
 
         transform.localRotation = Quaternion.identity;
 
@@ -157,6 +171,8 @@ public class RadarPivot : MonoBehaviour
             completionPanel.SetActive(false);
         }
 
+        SetPanelHudVisible(true);
+        SetTimerVisible(true);
         UpdateTimerDisplay();
 
         if (tutorialActive)
@@ -218,6 +234,18 @@ public class RadarPivot : MonoBehaviour
                 {
                     StartNewRotation();
                 }
+            }
+
+            return;
+        }
+
+        if (waitingToStartSweep)
+        {
+            sweepStartTimer -= Time.deltaTime;
+
+            if (sweepStartTimer <= 0f)
+            {
+                BeginSweep();
             }
 
             return;
@@ -308,7 +336,7 @@ public class RadarPivot : MonoBehaviour
             FlashScreen(Color.red);
 
             SetInstructionText(
-                "TUTORIAL: Incorrect\nDo not press SPACE when there is a warning."
+                "<b>Not that one.</b> A warning was showing, so hold off."
             );
         }
         else
@@ -316,7 +344,7 @@ public class RadarPivot : MonoBehaviour
             FlashScreen(Color.green);
 
             SetInstructionText(
-                "TUTORIAL: Correct\nYou pressed SPACE with no warning."
+                "<b>Correct.</b> Clear sweep, pressed in time."
             );
         }
     }
@@ -383,6 +411,8 @@ public class RadarPivot : MonoBehaviour
                 ? !pressedThisRotation
                 : pressedThisRotation;
 
+        bool alreadyShownFeedback = pressedThisRotation;
+
         if (correctResponse)
         {
             if (warningActive &&
@@ -391,18 +421,21 @@ public class RadarPivot : MonoBehaviour
                 warningTriangle.color = Color.green;
             }
 
-            FlashScreen(Color.green);
+            if (!alreadyShownFeedback)
+            {
+                FlashScreen(Color.green);
+            }
 
             if (warningActive)
             {
                 SetInstructionText(
-                    "TUTORIAL: Correct\nYou did not press SPACE."
+                    "<b>Correct.</b> Warning showing, so you held off."
                 );
             }
             else
             {
                 SetInstructionText(
-                    "TUTORIAL: Correct\nYou pressed SPACE."
+                    "<b>Correct.</b> Clear sweep, pressed in time."
                 );
             }
 
@@ -420,18 +453,21 @@ public class RadarPivot : MonoBehaviour
                 warningTriangle.color = Color.red;
             }
 
-            FlashScreen(Color.red);
+            if (!alreadyShownFeedback)
+            {
+                FlashScreen(Color.red);
+            }
 
             if (warningActive)
             {
                 SetInstructionText(
-                    "TUTORIAL: Incorrect\nDo not press SPACE when there is a warning.\nRestarting practice..."
+                    "<b>Not that one.</b> That sweep had a warning. Practice restarts."
                 );
             }
             else
             {
                 SetInstructionText(
-                    "TUTORIAL: Missed\nPress SPACE when there is no warning.\nRestarting practice..."
+                    "<b>Too slow.</b> That sweep was clear. Practice restarts."
                 );
             }
 
@@ -452,7 +488,11 @@ public class RadarPivot : MonoBehaviour
     private void StartNewRotation()
     {
         pressedThisRotation = false;
-        rotationStartTime = Time.time;
+        degreesRotated = 0f;
+        transform.localRotation = Quaternion.identity;
+
+        UpdateTimerDisplay();
+        SetWarningVisible(false);
 
         if (warningTriangle != null)
         {
@@ -464,24 +504,13 @@ public class RadarPivot : MonoBehaviour
             warningActive = tutorialSweepIndex % 2 == 1;
 
             SetPhaseText(
-                "TUTORIAL " +
+                "PRACTICE " +
                 (tutorialSweepIndex + 1) +
                 "/" +
                 tutorialSweeps
             );
 
-            if (warningActive)
-            {
-                SetInstructionText(
-                    "TUTORIAL: do not press SPACE (Warning)"
-                );
-            }
-            else
-            {
-                SetInstructionText(
-                    "TUTORIAL: press SPACE (no warning)"
-                );
-            }
+            SetInstructionText("<b>Get ready.</b> Watch where the sweep starts.");
         }
         else
         {
@@ -489,6 +518,42 @@ public class RadarPivot : MonoBehaviour
                 Random.value < warningChance;
 
             SetPhaseText("RADAR WATCH");
+        }
+
+        float delay =
+            tutorialActive
+                ? tutorialSweepStartDelay
+                : sweepStartDelay;
+
+        if (delay > 0f)
+        {
+            waitingToStartSweep = true;
+            sweepStartTimer = delay;
+            return;
+        }
+
+        BeginSweep();
+    }
+
+    private void BeginSweep()
+    {
+        waitingToStartSweep = false;
+        rotationStartTime = Time.time;
+
+        if (tutorialActive)
+        {
+            if (warningActive)
+            {
+                SetInstructionText(
+                    "<b>Warning showing.</b> Do not press."
+                );
+            }
+            else
+            {
+                SetInstructionText(
+                    "<b>Clear sweep.</b> Press SPACE before it comes around."
+                );
+            }
         }
 
         SetWarningVisible(warningActive);
@@ -531,11 +596,12 @@ public class RadarPivot : MonoBehaviour
         SetWarningVisible(false);
         HideFlash();
         SetPhaseText("GET READY");
+        UpdateTimerDisplay();
 
         for (int number = countdownSeconds; number >= 1; number--)
         {
             SetInstructionText(
-                "The real game will start in:\n" +
+                "<b>Practice done.</b> Real run starts in " +
                 number
             );
 
@@ -557,13 +623,14 @@ public class RadarPivot : MonoBehaviour
         pressedThisRotation = false;
         warningActive = false;
         waitingForNextRotation = false;
+        waitingToStartSweep = false;
         transitionTimer = 0f;
 
         transform.localRotation = Quaternion.identity;
 
         SetWarningVisible(false);
         SetPhaseText("RADAR WATCH");
-        SetInstructionText("Radar Watch begins (Fast)");
+        SetInstructionText("<b>Go.</b> Press on clear sweeps, hold off when a warning shows.");
 
         temporaryMessageTimer =
             scoredStartMessageDuration;
@@ -590,61 +657,35 @@ public class RadarPivot : MonoBehaviour
 
         if (completionPanel != null)
         {
-            completionPanel.SetActive(true);
+            completionPanel.SetActive(false);
         }
 
-        if (completionText == null)
+        if (passFailCounter != null)
         {
-            return;
+            FinalScore = CalculateFinalScore();
+
+            RadarWatchResults.Record(
+                FinalScore,
+                passFailCounter.Passes,
+                passFailCounter.Fails,
+                passFailCounter.FalsePositives,
+                passFailCounter.FalseNegatives,
+                passFailCounter.HasReactionTime,
+                passFailCounter.AverageReactionTime
+            );
         }
 
-        if (passFailCounter == null)
-        {
-            completionText.text =
-                "Radar Watch Complete";
-
-            return;
-        }
-
-        string averageReaction =
-            passFailCounter.HasReactionTime
-                ? passFailCounter
-                    .AverageReactionTime
-                    .ToString("F3") + " s"
-                : "--";
-
-        FinalScore = CalculateFinalScore();
-
-        RadarWatchResults.Record(
-            FinalScore,
-            passFailCounter.Passes,
-            passFailCounter.Fails,
-            passFailCounter.FalsePositives,
-            passFailCounter.FalseNegatives,
-            passFailCounter.HasReactionTime,
-            passFailCounter.AverageReactionTime
-        );
-
-        completionText.text =
-            "Radar Watch Complete\n\n" +
-            "Score: " +
-            FinalScore +
-            "/100" +
-            "\n\nPasses: " +
-            passFailCounter.Passes +
-            "\nFails: " +
-            passFailCounter.Fails +
-            "\nFalse Positives: " +
-            passFailCounter.FalsePositives +
-            "\nFalse Negatives: " +
-            passFailCounter.FalseNegatives +
-            "\nAverage Reaction: " +
-            averageReaction;
+        StartCoroutine(LoadResultsScreen());
     }
 
-    public void OnContinueToResultsClicked()
+    private IEnumerator LoadResultsScreen()
     {
-        SceneManager.LoadScene("ResultsScreen");
+        if (resultsTransitionDelay > 0f)
+        {
+            yield return new WaitForSeconds(resultsTransitionDelay);
+        }
+
+        SceneTransition.LoadScene(resultsSceneName);
     }
 
     private int CalculateFinalScore()
@@ -764,6 +805,11 @@ public class RadarPivot : MonoBehaviour
 
         tutorialInstructionText.gameObject.SetActive(true);
         tutorialInstructionText.text = message;
+
+        if (tutorialBanner != null)
+        {
+            tutorialBanner.SetActive(true);
+        }
     }
 
     private void HideInstructionText()
@@ -772,12 +818,50 @@ public class RadarPivot : MonoBehaviour
         {
             tutorialInstructionText.gameObject.SetActive(false);
         }
+
+        if (tutorialBanner != null)
+        {
+            tutorialBanner.SetActive(false);
+        }
+    }
+
+    private void SetPanelHudVisible(bool visible)
+    {
+        if (panelHud != null)
+        {
+            panelHud.SetActive(visible);
+        }
+    }
+
+    private void SetTimerVisible(bool visible)
+    {
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(visible);
+        }
     }
 
     private void UpdateTimerDisplay()
     {
         if (timerText == null)
         {
+            return;
+        }
+
+        if (tutorialActive)
+        {
+            int currentSweep =
+                Mathf.Min(
+                    tutorialSweepIndex + 1,
+                    tutorialSweeps
+                );
+
+            timerText.text =
+                "<b>Practice</b> " +
+                currentSweep +
+                " of " +
+                tutorialSweeps;
+
             return;
         }
 
@@ -797,10 +881,12 @@ public class RadarPivot : MonoBehaviour
             totalSeconds % 60;
 
         timerText.text =
+            "<b>Time left</b> " +
             minutes +
             ":" +
             seconds.ToString("00");
     }
+
 
     private void UpdateFlash()
     {
@@ -820,6 +906,18 @@ public class RadarPivot : MonoBehaviour
 
     private void FlashScreen(Color flashColor)
     {
+        if (passFailCounter != null)
+        {
+            if (flashColor == Color.red)
+            {
+                passFailCounter.PlayIncorrect();
+            }
+            else if (flashColor == Color.green)
+            {
+                passFailCounter.PlayCorrect();
+            }
+        }
+
         if (greenFlash == null)
         {
             return;

@@ -218,6 +218,9 @@ MonoBehaviour:
   referenceImpactSpeed: 1400
   maxCollisionVolume: 0.85
   fallSoundVolume: 0.6
+  pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
+  dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+
 --- !u!1 &204939171
 GameObject:
   m_ObjectHideFlags: 0
@@ -730,6 +733,7 @@ GameObject:
   - component: {fileID: 397707987}
   - component: {fileID: 397707986}
   - component: {fileID: 397707985}
+  - component: {fileID: 1600000001}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -746,7 +750,7 @@ RectTransform:
   m_GameObject: {fileID: 397707983}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5.897259, y: 6.4130096, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1957430161}
@@ -755,7 +759,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 470, y: -337}
-  m_SizeDelta: {x: 81.3742, y: 58.3482}
+  m_SizeDelta: {x: 420, y: 203}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &397707985
 MonoBehaviour:
@@ -779,12 +783,12 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.88, g: 0.88, b: 0.88, a: 1}
+    m_PressedColor: {r: 0.72, g: 0.72, b: 0.72, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.08
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -1413,6 +1417,9 @@ MonoBehaviour:
   referenceImpactSpeed: 1400
   maxCollisionVolume: 0.85
   fallSoundVolume: 0.6
+  pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
+  dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+
 --- !u!1 &1087090273
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,11 +1758,18 @@ MonoBehaviour:
   - {fileID: 280908074}
   - {fileID: 695764296}
   startPanel: {fileID: 1307316701}
+  resultFont: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   participantAge: 16
-  expectedTimeMultiplier: 1
-  paceTolerance: 0.6
+  expectedTimeMultiplier: 0.76
+  paceTolerance: 0.88
   initialThinkingWeight: 1
   subsequentThinkingWeight: 2.33
+  resultSeconds: 2
+  finalResultSeconds: 4
+  finalPanelHeight: 130
+  solvedSound: {fileID: 8300000, guid: 1713b42e0263647aea8fc8fa12e87fe4, type: 3}
+  optimalSolveSound: {fileID: 8300000, guid: 8155f127bfc0d4c7c9404874b3de0dc7, type: 3}
+
 --- !u!4 &1257229398
 Transform:
   m_ObjectHideFlags: 0
@@ -1961,6 +1975,9 @@ MonoBehaviour:
   referenceImpactSpeed: 1400
   maxCollisionVolume: 0.85
   fallSoundVolume: 0.6
+  pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
+  dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+
 --- !u!1 &1545744770
 GameObject:
   m_ObjectHideFlags: 0
@@ -2277,7 +2294,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -543, y: -250}
+  m_AnchoredPosition: {x: -543, y: -255.0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1844499828
@@ -2428,7 +2445,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -593, y: -180.99}
+  m_AnchoredPosition: {x: -593, y: -185.99}
   m_SizeDelta: {x: 475.1481, y: 88.0235}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1882667267
@@ -2571,8 +2588,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
+  m_sharedMaterial: {fileID: -7805491195033280183, guid: 1c134d1583f76476e850fd5c2460ef1b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2665,7 +2682,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 687.12, y: 202.84}
+  m_AnchoredPosition: {x: 687.12, y: 232.84}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1957430160
@@ -2752,8 +2769,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 110
+  m_fontSizeBase: 110
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3103,3 +3120,25 @@ SceneRoots:
   - {fileID: 786015233}
   - {fileID: 1971275244}
   - {fileID: 1239633529}
+
+--- !u!114 &1600000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 397707983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3d64f27b1e4c5fa02e91d7c6b45083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverScale
+  restScale: 0.97
+  hoverScale: 1.03
+  pressScale: 0.99
+  popSeconds: 0.18
+  settleSeconds: 0.12
+  hoverSound: {fileID: 8300000, guid: 1417992c6e464430f933d28350cca694, type: 3}
+  clickSound: {fileID: 8300000, guid: 8aaa69e1e935f49babb4658a7bfcf416, type: 3}
+  hoverVolume: 0.5
+  clickVolume: 0.35

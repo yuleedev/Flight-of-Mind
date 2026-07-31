@@ -28,6 +28,8 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private AudioClip fallSound;
     [Tooltip("Wood-on-wood impact sound played on landing and again on every bounce after it. Leave empty for no sound.")]
     [SerializeField] private AudioClip collisionSound;
+    [SerializeField] private AudioClip pickupSound;
+    [SerializeField] private AudioClip dropSound;
     [Tooltip("Impact speed (pixels/second) at or above which the collision sound plays at Max Collision Volume. Softer impacts (later, smaller bounces) scale down from this automatically.")]
     [SerializeField] private float referenceImpactSpeed = 1400f;
     [Tooltip("Volume the collision sound plays at when impact speed >= Reference Impact Speed.")]
@@ -102,6 +104,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         canvasGroup.blocksRaycasts = false;
         transform.SetParent(canvas.transform, true);
+        Sfx.Play(pickupSound);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -153,6 +156,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
 
         StackSlot fromSlot = startSlot;
+        Sfx.Play(dropSound);
 
         transform.SetParent(targetSlot.transform, true);
         transform.SetAsLastSibling();
@@ -234,8 +238,7 @@ public class DraggableCargo : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private void PlaySound(AudioClip clip, float volume)
     {
-        if (clip == null || audioSource == null) return;
-        audioSource.PlayOneShot(clip, volume);
+        Sfx.Play(clip, volume);
     }
 
     private StackSlot GetMostOverlappingSlot()

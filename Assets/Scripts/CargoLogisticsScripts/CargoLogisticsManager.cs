@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +28,8 @@ public class CargoLogisticsManager : MonoBehaviour
 
     [Header("Instructions")]
     [SerializeField] private GameObject startPanel;
+    [Tooltip("Font for the result banner. Leave empty to use the TextMeshPro default.")]
+    [SerializeField] private TMPro.TMP_FontAsset resultFont;
 
     [Header("Participant")]
     [Tooltip("Fallback only. Ignored if an earlier scene already called CargoLogisticsNorms.SetAge.")]
@@ -43,6 +44,18 @@ public class CargoLogisticsManager : MonoBehaviour
     [SerializeField, Range(0f, 3f)] private float initialThinkingWeight = 1.00f;
     [Tooltip("Cost multiplier on hesitation between moves.")]
     [SerializeField, Range(0f, 3f)] private float subsequentThinkingWeight = 2.33f;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip solvedSound;
+    [SerializeField] private AudioClip optimalSolveSound;
+
+    [Header("Result Panel Timing")]
+    [Tooltip("How long the result panel stays up between problems.")]
+    [SerializeField] private float resultSeconds = 2f;
+    [Tooltip("How long the final result panel stays up before the Radar scene loads. Raise this if the last problem's result flashes past.")]
+    [SerializeField] private float finalResultSeconds = 4f;
+    [Tooltip("Height in canvas pixels of the final panel, which carries an extra line of text.")]
+    [SerializeField] private float finalPanelHeight = 130f;
 
     private Canvas canvas;
     private int moveCount = 0;
@@ -67,6 +80,8 @@ void Awake()
 
         if (!CargoLogisticsNorms.AgeSet)
             CargoLogisticsNorms.SetAge(participantAge);
+
+        ResultDisplay.SetFont(resultFont);
         ApplyPacingSettings();
     }
 
@@ -194,21 +209,31 @@ void Awake()
         CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves,
                                      ruleViolations, initial, subsequent, animation, total);
 
+        bool optimal = moveCount <= currentOptimalMoves && ruleViolations == 0;
+        Sfx.Play(optimal && optimalSolveSound != null ? optimalSolveSound : solvedSound);
+
+        Time.timeScale = 0f;
+
+        if (isLastProblem)
+        {
+            CargoLogisticsScoring.ComputeFinalScores();
+
+            ResultDisplay.Show(canvas,
+                $"Solved in {moveCount} moves (optimal was {currentOptimalMoves}).\nAll problems complete!",
+                finalPanelHeight, 32f);
+
+            StartCoroutine(AdvanceAfterDelay(finalResultSeconds, true));
+            return;
+        }
+
         string message;
         if (problem.isPractice)
             message = "Practice complete! Starting the timed problems...";
-        else if (isLastProblem)
-            message = "All problems complete!";
         else
             message = $"Solved in {moveCount} moves (optimal was {currentOptimalMoves}).";
 
         ResultDisplay.Show(canvas, message);
-        Time.timeScale = 0f;
-
-        if (isLastProblem)
-            CargoLogisticsScoring.ComputeFinalScores();
-
-        StartCoroutine(AdvanceAfterDelay(2f, isLastProblem));
+        StartCoroutine(AdvanceAfterDelay(resultSeconds, false));
     }
 
     private IEnumerator AdvanceAfterDelay(float seconds, bool isLastProblem)
@@ -220,7 +245,7 @@ void Awake()
         if (isLastProblem)
         {
             sessionComplete = true;
-            SceneManager.LoadScene("Radar");
+            SceneTransition.LoadScene("Radar");
         }
         else
         {

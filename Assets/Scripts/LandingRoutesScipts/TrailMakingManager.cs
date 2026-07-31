@@ -1,6 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class TrailMakingManager : MonoBehaviour
 {
@@ -29,7 +29,18 @@ public class TrailMakingManager : MonoBehaviour
     public TMP_Text timerText;
     public TMP_Text errorCountText;
 
+	[Header("Audio")]
+    public AudioClip correctTargetSound;
+    public AudioClip wrongTargetSound;
+    public AudioClip roundCompleteSound;
+    [Tooltip("Each beacon in a row nudges the pitch up by this much. Resets on an error.")]
+    public float chainPitchStep = 0.04f;
+    public int chainPitchCap = 12;
+    [Range(0f, 1f)] public float correctVolume = 0.35f;
+
 	public float nextSceneDelay = 3f;
+    [Tooltip("Beat after the last waypoint connects, before the next screen appears.")]
+    public float endOfRoundPause = 0.9f;
     Waypoint[] route;
     int currentIndex;
     int errors;
@@ -37,6 +48,7 @@ public class TrailMakingManager : MonoBehaviour
     bool finished;
     bool inTutorial;
     Waypoint lastWaypointOver;
+    int chain;
 
     float timeA;
     int errorsA;
@@ -47,6 +59,9 @@ public class TrailMakingManager : MonoBehaviour
     {
         Instance = this;
         TrailMakingResults.Clear();
+
+        if (routeA != null && routeA.Length > 1)
+            TrailMakingScoring.TargetsPerRoute = routeA.Length;
     }
 
     void Update()
@@ -83,6 +98,7 @@ public class TrailMakingManager : MonoBehaviour
         errors = 0;
         finished = false;
         lastWaypointOver = null;
+        chain = 0;
 
         for (int i = 0; i < route.Length; i++)
         {
@@ -149,6 +165,12 @@ public class TrailMakingManager : MonoBehaviour
 
     void StartPartA()
     {
+        SwapToPartA();
+        BeginTiming();
+    }
+
+    void SwapToPartA()
+    {
         inTutorial = false;
         part = TestPart.A;
         route = routeA;
@@ -157,25 +179,54 @@ public class TrailMakingManager : MonoBehaviour
         if (partAObjects != null) partAObjects.SetActive(true);
         if (partBObjects != null) partBObjects.SetActive(false);
 
-        if (timerText != null) timerText.gameObject.SetActive(true);
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(true);
+            timerText.text = "Time: 0.0s";
+        }
+
         if (errorCountText != null) errorCountText.gameObject.SetActive(true);
 
         SetupRound();
+        finished = true;
     }
 
     public void OnReadyClicked()
 	{
     	if (readyPanel != null) readyPanel.SetActive(false);
-    	if (partAObjects != null) partAObjects.SetActive(false);
-    	if (partBObjects != null) partBObjects.SetActive(true);
-
-    	if (timerText != null) timerText.gameObject.SetActive(true);
-    	if (errorCountText != null) errorCountText.gameObject.SetActive(true);
-
-    	part = TestPart.B;
-    	route = routeB;
-    	SetupRound();
+    	StartPartB();
 	}
+
+    void StartPartB()
+    {
+        SwapToPartB();
+        BeginTiming();
+    }
+
+    void SwapToPartB()
+    {
+        if (partAObjects != null) partAObjects.SetActive(false);
+        if (partBObjects != null) partBObjects.SetActive(true);
+
+        if (timerText != null)
+        {
+            timerText.gameObject.SetActive(true);
+            timerText.text = "Time: 0.0s";
+        }
+
+        if (errorCountText != null) errorCountText.gameObject.SetActive(true);
+
+        part = TestPart.B;
+        route = routeB;
+        SetupRound();
+        finished = true;
+    }
+
+    void BeginTiming()
+    {
+        startTime = Time.time;
+        finished = false;
+    }
 
     public void Draw(Vector3 penPos)
     {
@@ -219,6 +270,8 @@ public class TrailMakingManager : MonoBehaviour
         else if (over.order > currentIndex)
         {
             errors++;
+            chain = 0;
+            Sfx.Play(wrongTargetSound);
             UpdateErrorDisplay();
             if (messagePanel != null)
             {
@@ -232,6 +285,10 @@ public class TrailMakingManager : MonoBehaviour
         w.MarkVisited();
         currentIndex++;
 
+        Sfx.Play(correctTargetSound, correctVolume,
+                 1f + chainPitchStep * Mathf.Min(chain, chainPitchCap));
+        chain++;
+
         if (messagePanel != null) messagePanel.SetActive(false);
 
         if (currentIndex >= route.Length)
@@ -243,17 +300,14 @@ public class TrailMakingManager : MonoBehaviour
     void FinishRound()
     {
         finished = true;
+        Sfx.Play(roundCompleteSound);
         float total = Time.time - startTime;
 
         if (timerText != null) timerText.text = "Time: " + total.ToString("F1") + "s";
 
         if (inTutorial)
         {
-            if (timerText != null) timerText.gameObject.SetActive(false);
-            if (errorCountText != null) errorCountText.gameObject.SetActive(false);
-            if (tutorialObjects != null) tutorialObjects.SetActive(false);
-            if (tutorialDonePanel != null) tutorialDonePanel.SetActive(true);
-            else StartPartA();
+            StartCoroutine(EndTutorialRound());
             return;
         }
 
@@ -262,9 +316,7 @@ public class TrailMakingManager : MonoBehaviour
             timeA = total;
             errorsA = errors;
             TrailMakingResults.Record("A", timeA, errorsA);
-            if (readyPanel != null) readyPanel.SetActive(true);
-			if (timerText != null) timerText.gameObject.SetActive(false);
-    		if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+            StartCoroutine(EndPartA());
         }
         else
 		{
@@ -272,9 +324,31 @@ public class TrailMakingManager : MonoBehaviour
     		errorsB = errors;
     		TrailMakingResults.Record("B", timeB, errorsB);
     		TrailMakingResults.LogResults();
+    		TrailMakingScoring.LogScores();
     		ShowResults();
     		Invoke(nameof(GoToCargo), nextSceneDelay);
 		}
+    }
+
+    IEnumerator EndTutorialRound()
+    {
+        yield return new WaitForSecondsRealtime(endOfRoundPause);
+
+        if (timerText != null) timerText.gameObject.SetActive(false);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(false);
+        if (tutorialObjects != null) tutorialObjects.SetActive(false);
+
+        if (tutorialDonePanel != null) tutorialDonePanel.SetActive(true);
+        else StartPartA();
+    }
+
+    IEnumerator EndPartA()
+    {
+        yield return new WaitForSecondsRealtime(endOfRoundPause);
+
+        if (readyPanel != null) readyPanel.SetActive(true);
+        if (timerText != null) timerText.gameObject.SetActive(false);
+        if (errorCountText != null) errorCountText.gameObject.SetActive(false);
     }
 
     void ShowResults()
@@ -332,6 +406,6 @@ public class TrailMakingManager : MonoBehaviour
 
 	void GoToCargo()
 	{
-    	SceneManager.LoadScene("cargoGame");
+    	SceneTransition.LoadScene("cargoGame");
 	}
 }

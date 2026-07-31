@@ -44,7 +44,6 @@ public class PassFailCounter : MonoBehaviour
     public void AddPass()
     {
         passes++;
-        PlaySound(correctSound);
         UpdateDisplay();
     }
 
@@ -53,16 +52,24 @@ public class PassFailCounter : MonoBehaviour
         passes++;
         totalReactionTime += reactionTime;
         reactionTimeCount++;
-        PlaySound(correctSound);
         UpdateDisplay();
+    }
+
+    public void PlayCorrect()
+    {
+        PlaySound(correctSound);
     }
 
     public void AddFalsePositive()
     {
         fails++;
         falsePositives++;
-        PlaySound(incorrectSound);
         UpdateDisplay();
+    }
+
+    public void PlayIncorrect()
+    {
+        PlaySound(incorrectSound);
     }
 
     public void AddFalseNegative()
@@ -86,55 +93,32 @@ public class PassFailCounter : MonoBehaviour
 
     private void PlaySound(AudioClip clip)
     {
+        Sfx.Play(clip);
+    }
 
-
-        if (sfxSource == null || clip == null) return;
-        sfxSource.PlayOneShot(clip);
+    private static string Row(string label, string value)
+    {
+        return "<b>" + label + ":</b> " + value;
     }
 
     private void UpdateDisplay()
     {
         if (passText != null)
-        {
-            passText.text =
-                "Passes: " + passes;
-        }
+            passText.text = Row("Correct", passes.ToString());
 
         if (failText != null)
-        {
-            failText.text =
-                "Fails: " + fails;
-        }
+            failText.text = Row("Total errors", fails.ToString());
 
         if (falsePositiveText != null)
-        {
-            falsePositiveText.text =
-                "False Positives: " +
-                falsePositives;
-        }
+            falsePositiveText.text = Row("Wrong press", falsePositives.ToString());
 
         if (falseNegativeText != null)
-        {
-            falseNegativeText.text =
-                "False Negatives: " +
-                falseNegatives;
-        }
+            falseNegativeText.text = Row("Missed sweep", falseNegatives.ToString());
 
         if (averageReactionTimeText != null)
         {
-            if (!HasReactionTime)
-            {
-                averageReactionTimeText.text =
-                    "Average Reaction: --";
-            }
-            else
-            {
-                averageReactionTimeText.text =
-                    "Average Reaction: " +
-                    AverageReactionTime
-                        .ToString("F3") +
-                    " s";
-            }
+            averageReactionTimeText.text = Row("Reaction",
+                HasReactionTime ? AverageReactionTime.ToString("F2") + " s" : "--");
         }
     }
 }

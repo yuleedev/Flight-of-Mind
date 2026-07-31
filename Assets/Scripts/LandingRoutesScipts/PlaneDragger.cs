@@ -5,12 +5,19 @@ public class PlaneDragger : MonoBehaviour
 {
     public Camera cam;
 
+    [Header("Audio")]
+    public AudioClip selectSound;
+    public AudioClip deselectSound;
+    public AudioClip dragLoop;
+    [Range(0f, 1f)] public float dragLoopVolume = 0.35f;
+
     [Header("Bounds")]
     public Collider2D playArea;
     public float padding = 0f;
 
     Collider2D col;
     bool drawing;
+    AudioSource loopSource;
 
     void Start()
     {
@@ -18,6 +25,15 @@ public class PlaneDragger : MonoBehaviour
         if (cam == null)
         {
             cam = Camera.main;
+        }
+
+        if (dragLoop != null)
+        {
+            loopSource = gameObject.AddComponent<AudioSource>();
+            loopSource.clip = dragLoop;
+            loopSource.loop = true;
+            loopSource.playOnAwake = false;
+            loopSource.volume = dragLoopVolume;
         }
     }
 
@@ -36,10 +52,14 @@ public class PlaneDragger : MonoBehaviour
             if (drawing)
             {
                 drawing = false;
+                Sfx.Play(deselectSound);
+                if (loopSource != null) loopSource.Stop();
             }
             else if (col.OverlapPoint(mousePos))
             {
                 drawing = true;
+                Sfx.Play(selectSound);
+                if (loopSource != null && !loopSource.isPlaying) loopSource.Play();
             }
         }
 
