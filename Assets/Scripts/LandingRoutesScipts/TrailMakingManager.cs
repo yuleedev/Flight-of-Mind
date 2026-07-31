@@ -33,9 +33,6 @@ public class TrailMakingManager : MonoBehaviour
     public AudioClip correctTargetSound;
     public AudioClip wrongTargetSound;
     public AudioClip roundCompleteSound;
-    [Tooltip("Each beacon in a row nudges the pitch up by this much. Resets on an error.")]
-    public float chainPitchStep = 0.04f;
-    public int chainPitchCap = 12;
     [Range(0f, 1f)] public float correctVolume = 0.18f;
 
     [Header("Finish")]
@@ -52,7 +49,6 @@ public class TrailMakingManager : MonoBehaviour
     bool finished;
     bool inTutorial;
     Waypoint lastWaypointOver;
-    int chain;
 
     public bool IsFinished => finished;
 
@@ -104,7 +100,6 @@ public class TrailMakingManager : MonoBehaviour
         errors = 0;
         finished = false;
         lastWaypointOver = null;
-        chain = 0;
 
         for (int i = 0; i < route.Length; i++)
         {
@@ -138,6 +133,7 @@ public class TrailMakingManager : MonoBehaviour
 	public void OnStartClicked()
 	{
     	if (startPanel != null) startPanel.SetActive(false);
+    	SceneMusic.StartGameMusic();
     	StartTutorial();
 	}
 
@@ -276,7 +272,6 @@ public class TrailMakingManager : MonoBehaviour
         else if (over.order > currentIndex)
         {
             errors++;
-            chain = 0;
             Sfx.Play(wrongTargetSound);
             UpdateErrorDisplay();
             if (messagePanel != null)
@@ -291,9 +286,7 @@ public class TrailMakingManager : MonoBehaviour
         w.MarkVisited();
         currentIndex++;
 
-        Sfx.Play(correctTargetSound, correctVolume,
-                 1f + chainPitchStep * Mathf.Min(chain, chainPitchCap));
-        chain++;
+        Sfx.Play(correctTargetSound, correctVolume);
 
         if (messagePanel != null) messagePanel.SetActive(false);
 

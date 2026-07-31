@@ -220,6 +220,7 @@ MonoBehaviour:
   fallSoundVolume: 0.6
   pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
   dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+  sfxVolume: 0.55
 
 --- !u!1 &204939171
 GameObject:
@@ -1421,6 +1422,7 @@ MonoBehaviour:
   fallSoundVolume: 0.6
   pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
   dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+  sfxVolume: 0.55
 
 --- !u!1 &1087090273
 GameObject:
@@ -1770,7 +1772,7 @@ MonoBehaviour:
   finalResultSeconds: 4
   finalPanelHeight: 130
   solvedSound: {fileID: 8300000, guid: 1713b42e0263647aea8fc8fa12e87fe4, type: 3}
-  optimalSolveSound: {fileID: 8300000, guid: 8155f127bfc0d4c7c9404874b3de0dc7, type: 3}
+  solvedVolume: 0.6
 
 --- !u!4 &1257229398
 Transform:
@@ -1980,6 +1982,7 @@ MonoBehaviour:
   fallSoundVolume: 0.6
   pickupSound: {fileID: 8300000, guid: a8f382a026eb045f299658c751a6406b, type: 3}
   dropSound: {fileID: 8300000, guid: 95dc44328a5e54276931d94c4f4cabb1, type: 3}
+  sfxVolume: 0.55
 
 --- !u!1 &1545744770
 GameObject:
@@ -3286,3 +3289,56 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+
+--- !u!1 &1780000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1780000002}
+  - component: {fileID: 1780000003}
+  m_Layer: 0
+  m_Name: SceneMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+
+--- !u!4 &1780000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+
+--- !u!114 &1780000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1f3a95d2e847b18a04e7f2b53c9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneMusic
+  instructionsClip: {fileID: 8300000, guid: 844ae9d0e4ac94502b27923e90b95a92, type: 3}
+  gameClip: {fileID: 8300000, guid: 88323fd851da748e88eee395a26f18af, type: 3}
+  volume: 0.12
+  fadeInSeconds: 2.0
+  fadeOutSeconds: 0.8
+  gameFadeInSeconds: 2

@@ -15,8 +15,14 @@ public class SceneTransition : MonoBehaviour
     private const float SettleFrameTime = 1f / 30f;
     private const float MaxSettleSeconds = 0.5f;
 
+    public static float WhooshVolume = 0.5f;
+
+    private const string WhooshResource = "universfield-swoosh-014-383768";
+
     private static SceneTransition instance;
     private static Sprite blockSprite;
+    private static AudioClip whoosh;
+    private static bool whooshLoaded;
 
     private Image cover;
     private RectTransform coverRect;
@@ -75,6 +81,20 @@ public class SceneTransition : MonoBehaviour
         instance.Build();
     }
 
+    private static AudioClip Whoosh()
+    {
+        if (!whooshLoaded)
+        {
+            whooshLoaded = true;
+            whoosh = Resources.Load<AudioClip>(WhooshResource);
+
+            if (whoosh == null)
+                Debug.LogWarning("[SceneTransition] transition sound '" + WhooshResource + "' not found in a Resources folder.");
+        }
+
+        return whoosh;
+    }
+
     private void Build()
     {
         Canvas canvas = gameObject.AddComponent<Canvas>();
@@ -116,6 +136,7 @@ public class SceneTransition : MonoBehaviour
     private IEnumerator Run(string sceneName, int buildIndex)
     {
         coverRect.gameObject.SetActive(true);
+        Sfx.Play(Whoosh(), WhooshVolume);
 
         cover.fillOrigin = (int)Image.OriginVertical.Top;
         yield return Wipe(0f, 1f, CoverSeconds);
@@ -153,6 +174,7 @@ public class SceneTransition : MonoBehaviour
     private IEnumerator RunSwap(System.Action onCovered, System.Action onRevealed)
     {
         coverRect.gameObject.SetActive(true);
+        Sfx.Play(Whoosh(), WhooshVolume);
 
         cover.fillOrigin = (int)Image.OriginVertical.Top;
         yield return Wipe(0f, 1f, CoverSeconds);

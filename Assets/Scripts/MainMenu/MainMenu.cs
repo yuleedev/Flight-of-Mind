@@ -6,7 +6,7 @@ public class MainMenu : MonoBehaviour
     {
         SceneTransition.LoadScene(1);
     }
-    
+
     public void QuitGame()
     {
         Application.Quit();

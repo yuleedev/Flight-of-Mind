@@ -171,6 +171,8 @@ public class RadarPivot : MonoBehaviour
             completionPanel.SetActive(false);
         }
 
+        SceneMusic.StartGameMusic();
+
         SetPanelHudVisible(true);
         SetTimerVisible(true);
         UpdateTimerDisplay();

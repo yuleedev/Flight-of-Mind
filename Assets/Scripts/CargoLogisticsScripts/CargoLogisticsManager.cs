@@ -46,8 +46,9 @@ public class CargoLogisticsManager : MonoBehaviour
     [SerializeField, Range(0f, 3f)] private float subsequentThinkingWeight = 2.33f;
 
     [Header("Audio")]
+    [Tooltip("Plays every time a problem is solved.")]
     [SerializeField] private AudioClip solvedSound;
-    [SerializeField] private AudioClip optimalSolveSound;
+    [SerializeField, Range(0f, 1f)] private float solvedVolume = 0.6f;
 
     [Header("Result Panel Timing")]
     [Tooltip("How long the result panel stays up between problems.")]
@@ -96,6 +97,7 @@ void Awake()
         CargoLogisticsResults.Clear();
 
         if (startPanel != null) startPanel.SetActive(false);
+        SceneMusic.StartGameMusic();
         LoadProblem(0);
     }
 
@@ -209,8 +211,7 @@ void Awake()
         CargoLogisticsResults.Record(currentProblemIndex, problem.isPractice, moveCount, currentOptimalMoves,
                                      ruleViolations, initial, subsequent, animation, total);
 
-        bool optimal = moveCount <= currentOptimalMoves && ruleViolations == 0;
-        Sfx.Play(optimal && optimalSolveSound != null ? optimalSolveSound : solvedSound);
+        Sfx.Play(solvedSound, solvedVolume);
 
         Time.timeScale = 0f;
 
