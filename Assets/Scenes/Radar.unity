@@ -1073,7 +1073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RadarPivot
   rotationSpeed: 200
   tutorialRotationSpeed: 60
-  levelDuration: 150
+  levelDuration: 90
   tutorialSweeps: 2
   tutorialFeedbackDuration: 3
   scoredStartMessageDuration: 2

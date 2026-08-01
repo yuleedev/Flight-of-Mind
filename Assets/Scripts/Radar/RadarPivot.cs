@@ -8,7 +8,7 @@ public class RadarPivot : MonoBehaviour
 {
     [SerializeField] private float rotationSpeed = 90f;
     [SerializeField] private float tutorialRotationSpeed = 20f;
-    [SerializeField] private float levelDuration = 150f;
+    [SerializeField] private float levelDuration = 90f;
     [SerializeField] private int tutorialSweeps = 2;
     [SerializeField] private float tutorialFeedbackDuration = 1.5f;
     [SerializeField] private float scoredStartMessageDuration = 2f;
