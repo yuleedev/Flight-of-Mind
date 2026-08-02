@@ -77,6 +77,8 @@ public static class CargoLogisticsScoring
 public static float InitialThinkingWeight = 1.00f;
     public static float SubsequentThinkingWeight = 2.33f;
     public static float PaceTolerance = 0.60f;
+    public static float FastPaceMultiplier = 1.55f;
+    public static float PaceDeviationLimit = 1.40f;
     public static float ExpectedTimeMultiplier = 1.00f;
     public const float ExcessMoveDecay = 1.60f;
     public const float ViolationDecay = 0.25f;
@@ -170,10 +172,20 @@ public static float InitialThinkingWeight = 1.00f;
         return sum <= 0f ? 0f : Mathf.Clamp01(initialThinking / sum);
     }
 
+    public static float ScaledPaceDeviation(float logDeviation)
+    {
+        float limited = Mathf.Clamp(logDeviation, -PaceDeviationLimit, PaceDeviationLimit);
+        float tolerance = limited < 0f
+            ? PaceTolerance * Mathf.Max(1f, FastPaceMultiplier)
+            : PaceTolerance;
+
+        return limited / Mathf.Max(0.05f, tolerance);
+    }
+
     public static float PaceScoreFromDeviation(float logDeviation)
     {
-        float squared = logDeviation * logDeviation;
-        return 100f * Mathf.Exp(-squared / (2f * PaceTolerance * PaceTolerance));
+        float scaled = ScaledPaceDeviation(logDeviation);
+        return 100f * Mathf.Exp(-scaled * scaled / 2f);
     }
 
     private static float Logistic(float x)
@@ -233,14 +245,17 @@ public static float InitialThinkingWeight = 1.00f;
     {
         float weightSum = 0f;
         float squaredSum = 0f;
+        float rawSquaredSum = 0f;
         float linearSum = 0f;
 
         foreach (var t in CargoLogisticsResults.Trials)
         {
             if (t.isPractice) continue;
             float w = Mathf.Max(0.01f, t.expectedDeliberationSeconds);
+            float scaled = ScaledPaceDeviation(t.logPaceDeviation);
             weightSum += w;
-            squaredSum += w * t.logPaceDeviation * t.logPaceDeviation;
+            squaredSum += w * scaled * scaled;
+            rawSquaredSum += w * t.logPaceDeviation * t.logPaceDeviation;
             linearSum += w * t.logPaceDeviation;
         }
 
@@ -252,9 +267,9 @@ public static float InitialThinkingWeight = 1.00f;
         }
 
         float meanSquare = squaredSum / weightSum;
-        rmsDeviation = Mathf.Sqrt(meanSquare);
+        rmsDeviation = Mathf.Sqrt(rawSquaredSum / weightSum);
         meanDeviation = linearSum / weightSum;
-        return 100f * Mathf.Exp(-meanSquare / (2f * PaceTolerance * PaceTolerance));
+        return 100f * Mathf.Exp(-meanSquare / 2f);
     }
 
     public static void ComputeFinalScores()

@@ -1400,6 +1400,7 @@ GameObject:
   - component: {fileID: 436140371}
   - component: {fileID: 436140373}
   - component: {fileID: 436140372}
+  - component: {fileID: 9200000}
   m_Layer: 5
   m_Name: ReadyPanel
   m_TagString: Untagged
@@ -5239,6 +5240,7 @@ GameObject:
   - component: {fileID: 1534342708}
   - component: {fileID: 1534342707}
   - component: {fileID: 1534342706}
+  - component: {fileID: 9200001}
   m_Layer: 5
   m_Name: TutorialDonePanel
   m_TagString: Untagged
@@ -6323,7 +6325,7 @@ MonoBehaviour:
   m_text: 'This time alternate numbers and letters:
 
 
-    <size=140%><b>1     A     2     B     3     C</b></size>
+    <size=140%><b>1     A     2     b     3     C</b></size>
 
 
     The order still matters. A point out of order counts as an error.
@@ -7178,6 +7180,7 @@ GameObject:
   - component: {fileID: 1831682976}
   - component: {fileID: 1831682978}
   - component: {fileID: 1831682977}
+  - component: {fileID: 9200002}
   m_Layer: 5
   m_Name: StartPanel
   m_TagString: Untagged
@@ -8810,3 +8813,42 @@ MonoBehaviour:
   fadeInSeconds: 2.5
   fadeOutSeconds: 0.3
   gameFadeInSeconds: 0
+--- !u!114 &9200000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436140370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a078274fa74a6a9f2fa308d697d8d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  padding: 0
+--- !u!114 &9200001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534342705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a078274fa74a6a9f2fa308d697d8d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  padding: 0
+--- !u!114 &9200002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831682975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a078274fa74a6a9f2fa308d697d8d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  padding: 0

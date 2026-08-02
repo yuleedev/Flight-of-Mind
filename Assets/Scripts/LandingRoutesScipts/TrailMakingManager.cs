@@ -405,9 +405,9 @@ public class TrailMakingManager : MonoBehaviour
         else
         {
             char letter = (char)('A' + index / 2);
-            if (letter == 'I')
+            if (letter == 'I' || letter == 'G' || letter == 'B')
             {
-                return "i";
+                return char.ToLower(letter).ToString();
             }
             return letter.ToString();
         }

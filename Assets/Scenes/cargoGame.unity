@@ -635,7 +635,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<align=left><b>1.</b>   Drag the top box from one peg to another.
+  m_text: '<align=left><b>1.</b>   Only the top box in a column can be moved. Drag it to another column.
 
 
     <b>2.</b>   Match the target arrangement shown on the left.
@@ -1648,7 +1648,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96

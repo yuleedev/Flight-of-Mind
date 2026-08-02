@@ -18,10 +18,11 @@ public struct TrailMakingScores
 
 public static class TrailMakingScoring
 {
-    public static float ParSecondsPerHop = 1.15f;
-    public static float PaceHalvingPoint = 0.90f;
-    public static float SwitchCostHalvingPoint = 1.40f;
-    public static float ErrorCostInHops = 0.5f;
+    public static float ParSecondsPerHop = 1.50f;
+    public static float PaceHalvingPoint = 1.20f;
+    public static float SwitchCostPar = 1.80f;
+    public static float SwitchCostHalvingPoint = 1.10f;
+    public static float ErrorCostInHops = 0.4f;
     public static int TargetsPerRoute = 25;
 
     private const float MinValidSeconds = 1f;
@@ -31,10 +32,12 @@ public static class TrailMakingScoring
     public static float ParPartASeconds => ParSecondsPerHop * Hops;
 
     public static void Configure(float parSecondsPerHop, float paceHalvingPoint,
-                                 float switchCostHalvingPoint, float errorCostInHops)
+                                 float switchCostPar, float switchCostHalvingPoint,
+                                 float errorCostInHops)
     {
         ParSecondsPerHop = Mathf.Max(0.05f, parSecondsPerHop);
         PaceHalvingPoint = Mathf.Max(0.05f, paceHalvingPoint);
+        SwitchCostPar = Mathf.Max(1f, switchCostPar);
         SwitchCostHalvingPoint = Mathf.Max(0.05f, switchCostHalvingPoint);
         ErrorCostInHops = Mathf.Max(0f, errorCostInHops);
     }
@@ -76,7 +79,7 @@ public static class TrailMakingScoring
         scores.effectivePartBSeconds = EffectiveSeconds(b.timeSeconds, b.errors);
         scores.switchCostRatio = scores.effectivePartBSeconds / scores.effectivePartASeconds;
         scores.cognitiveFlexibilityScore =
-            HalvingScore(scores.switchCostRatio - 1f, SwitchCostHalvingPoint);
+            HalvingScore(scores.switchCostRatio - SwitchCostPar, SwitchCostHalvingPoint);
         scores.hasFlexibilityScore = true;
 
         return scores;
@@ -104,8 +107,8 @@ public static class TrailMakingScoring
         if (s.hasFlexibilityScore)
         {
             sb.AppendLine($"  cognitive flexibility {s.cognitiveFlexibilityScore}/100 - switch cost " +
-                          $"{s.switchCostRatio:F2}x (1.00x is a perfect run), " +
-                          $"every +{SwitchCostHalvingPoint:F2} of switch cost halves the score");
+                          $"{s.switchCostRatio:F2}x against par {SwitchCostPar:F2}x, " +
+                          $"every +{SwitchCostHalvingPoint:F2} beyond par halves the score");
         }
         else
         {
